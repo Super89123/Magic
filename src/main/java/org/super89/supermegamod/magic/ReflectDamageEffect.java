@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class ReflectDamageEffect implements Listener {
     private double reflectDamagePercentage = 0.95;
     private int reflectDamageDuration = 5 * 60 * 20; // 5 minutes
+    int a = 0;
     private int reflectDamageTicksLeft;
 
     public void apply(Player player, double reflectDamagePercentage, int reflectDamageDuration) {
