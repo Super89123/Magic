@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.StonecuttingRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Objects;
@@ -28,6 +29,8 @@ public class InvetoryWithBooks implements Listener {
         setItem(Material.BOOK, 1006, inventory,8, "Книга шипов");
         setItem(Material.BOOK, 1007, inventory, 9 , "Книга возвращения");
         setItem(Material.BOOK, 1010, inventory, 10, "Книга Защиты");
+        setItem(Material.BOOK, 1011, inventory, 11, "Книга Огня");
+        setItem(Material.BOOK, 1012, inventory, 12, "Книга Ветра");
 
         player.openInventory(inventory);
 
@@ -41,11 +44,12 @@ public class InvetoryWithBooks implements Listener {
         item.setItemMeta(meta);
         inv.setItem(slot, item);
 
+
     }
     @EventHandler
     public void PlayerInteractE(PlayerInteractEvent event){
         Player player = event.getPlayer();
-        if(event.getAction().name().contains("RIGHT_CLICK") && event.getClickedBlock().getType() == Material.FLETCHING_TABLE && event.getClickedBlock() != null){
+        if(event.getClickedBlock() != null && event.getAction().name().contains("RIGHT_CLICK") && event.getClickedBlock().getType() == Material.FLETCHING_TABLE && event.getClickedBlock() != null){
             OpenInventory(player);
         }
     }

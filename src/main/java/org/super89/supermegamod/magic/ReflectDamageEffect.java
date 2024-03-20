@@ -25,10 +25,7 @@ public class ReflectDamageEffect implements Listener {
             double damage = event.getDamage();
             event.setDamage(damage * reflectDamagePercentage);
             player.setLastDamage(damage * (1 - reflectDamagePercentage));
-            reflectDamageTicksLeft--;
-            if (reflectDamageTicksLeft <= 0) {
-                player.sendMessage("Reflect damage effect expired.");
-            }
+            new TimerTask(300);
         }
     }
 }

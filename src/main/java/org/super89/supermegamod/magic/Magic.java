@@ -3,6 +3,7 @@ package org.super89.supermegamod.magic;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
@@ -11,12 +12,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import org.bukkit.inventory.StonecuttingRecipe;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,6 +91,24 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new ReflectDamageEffect() , this);
         Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
         Bukkit.getPluginManager().registerEvents(new ResistanceBook(), this);
+        Bukkit.getPluginManager().registerEvents(new WindBook(), this);
+        Bukkit.getPluginManager().registerEvents(new FireBook(), this);
+        Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
+
+
+        ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
+        ItemStack paper = new ItemStack(Material.PAPER);
+
+        // Set the custom model data on the paper
+        ItemMeta paperMeta = paper.getItemMeta();
+        assert paperMeta != null;
+        PersistentDataContainer container = paperMeta.getPersistentDataContainer();
+        container.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 10000001);
+        paper.setItemMeta(paperMeta);
+
+        StonecuttingRecipe recipe123 = new StonecuttingRecipe(NamespacedKey.minecraft("nether_star_to_paper"), paper, Material.NETHER_STAR);
+
+        Bukkit.addRecipe(recipe123);
 
         ItemStack Hungry_sword = new ItemStack(Material.IRON_SWORD);
         ItemMeta Hungry_swordMeta = Hungry_sword.getItemMeta();
@@ -100,6 +124,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Hungry_swordRecipe.setIngredient('N', Material.ENDER_PEARL);
         Bukkit.addRecipe(Hungry_swordRecipe);
         plugin = this;
+
 
 
 

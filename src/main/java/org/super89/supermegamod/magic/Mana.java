@@ -111,8 +111,8 @@ public class Mana implements Listener {
         File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
         FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
         if(!player.hasPlayedBefore()){
-            playerDataConfig.set(uuid + "." + "maxmana", 10);
-            playerDataConfig.set(uuid + "." + "nowmana", 10);
+            playerDataConfig.set(uuid + "." + "maxmana", 100);
+            playerDataConfig.set(uuid + "." + "nowmana", 100);
             playerDataConfig.set(uuid + "." + "prokachka", 0);
             int slot = 17;
             player.getInventory().setItem(slot, new ItemStack(Material.NETHER_STAR));
