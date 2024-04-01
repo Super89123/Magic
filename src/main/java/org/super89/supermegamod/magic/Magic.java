@@ -110,6 +110,20 @@ public final class Magic extends JavaPlugin implements Listener {
 
         Bukkit.addRecipe(recipe123);
 
+        ItemStack rabbit_foot = new ItemStack(Material.RABBIT_FOOT);
+
+        // Set the custom model data on the paper
+        ItemMeta rabrMeta = rabbit_foot.getItemMeta();
+        assert rabrMeta != null;
+        PersistentDataContainer container1 = rabrMeta.getPersistentDataContainer();
+        container1.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 2025);
+        rabbit_foot.setItemMeta(rabrMeta);
+
+        StonecuttingRecipe recipe1234 = new StonecuttingRecipe(NamespacedKey.minecraft("lapis_lazuli_to_rabbit_foot"), rabbit_foot, Material.LAPIS_LAZULI);
+
+        Bukkit.addRecipe(recipe1234);
+
+
         ItemStack Hungry_sword = new ItemStack(Material.IRON_SWORD);
         ItemMeta Hungry_swordMeta = Hungry_sword.getItemMeta();
         Hungry_swordMeta.setCustomModelData(1488);

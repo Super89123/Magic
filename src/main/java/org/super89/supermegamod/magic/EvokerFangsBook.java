@@ -24,17 +24,19 @@ public class EvokerFangsBook implements Listener {
                 double pitch = player.getLocation().getPitch();
                 double radius = 0.5; // Adjust the radius as needed
                 int numFangs = 20; // Adjust the number of fangs as needed
+                if(event.getClickedBlock() != null) {
 
-                Location playerLocation = player.getLocation();
-                Vector direction = playerLocation.getDirection().normalize();
+                    Location blockLocation = event.getClickedBlock().getLocation();
+                    Vector direction = player.getLocation().getDirection().normalize();
 
-                for (int i = 0; i < numFangs; i++) {
-                    double angle = i * 2 * Math.PI / numFangs;
-                    double x = playerLocation.getX()+0.25 + radius * Math.cos(angle) + direction.getX() * i;
-                    double z = playerLocation.getZ()+0.25 + radius * Math.sin(angle) + direction.getZ() * i;
-                    Location spawnLocation = new Location(player.getWorld(), x, playerLocation.getY(), z, (float) yaw, (float) pitch);
-                    player.getWorld().spawnEntity(spawnLocation, EntityType.EVOKER_FANGS);
-                    ItemUtils.setDelay(20);
+                    for (int i = 0; i < numFangs; i++) {
+                        double angle = i * 2 * Math.PI / numFangs;
+                        double x = blockLocation.getX() + radius * Math.cos(angle) + direction.getX() * i;
+                        double z = blockLocation.getZ() + radius * Math.sin(angle) + direction.getZ() * i;
+                        Location spawnLocation = new Location(player.getWorld(), x, blockLocation.getY(), z, (float) yaw, (float) pitch);
+                        player.getWorld().spawnEntity(spawnLocation, EntityType.EVOKER_FANGS);
+                        ItemUtils.setDelay(20);
+                    }
                 }
             }
         }
