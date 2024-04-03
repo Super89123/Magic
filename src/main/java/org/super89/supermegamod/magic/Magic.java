@@ -32,6 +32,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
     Mana mana = new Mana(this);
+    ReflectBook reflectBook = new ReflectBook();
     private static Magic plugin;
 
 
@@ -104,6 +105,7 @@ public final class Magic extends JavaPlugin implements Listener {
         assert paperMeta != null;
         PersistentDataContainer container = paperMeta.getPersistentDataContainer();
         container.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 10000001);
+        paperMeta.setCustomModelData(100000001);
         paper.setItemMeta(paperMeta);
 
         StonecuttingRecipe recipe123 = new StonecuttingRecipe(NamespacedKey.minecraft("nether_star_to_paper"), paper, Material.NETHER_STAR);
@@ -117,6 +119,7 @@ public final class Magic extends JavaPlugin implements Listener {
         assert rabrMeta != null;
         PersistentDataContainer container1 = rabrMeta.getPersistentDataContainer();
         container1.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 2025);
+        rabrMeta.setCustomModelData(2025);
         rabbit_foot.setItemMeta(rabrMeta);
 
         StonecuttingRecipe recipe1234 = new StonecuttingRecipe(NamespacedKey.minecraft("lapis_lazuli_to_rabbit_foot"), rabbit_foot, Material.LAPIS_LAZULI);
@@ -178,6 +181,18 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0L, 40L);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                long currentTime = System.currentTimeMillis();
+                for (Player player : reflectBook.activePlayers.keySet()) {
+                    if (currentTime >= reflectBook.activePlayers.get(player)) {
+                        reflectBook.activePlayers.remove(player);
+                        player.sendMessage(ChatColor.RED + "Damage reflection effect expired!");
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0, 20);
     }
 
     @EventHandler

@@ -33,7 +33,7 @@ public class EvokerFangsBook implements Listener {
                         double angle = i * 2 * Math.PI / numFangs;
                         double x = blockLocation.getX() + radius * Math.cos(angle) + direction.getX() * i;
                         double z = blockLocation.getZ() + radius * Math.sin(angle) + direction.getZ() * i;
-                        Location spawnLocation = new Location(player.getWorld(), x, blockLocation.getY(), z, (float) yaw, (float) pitch);
+                        Location spawnLocation = new Location(player.getWorld(), x, blockLocation.getY()+1, z, (float) yaw, (float) pitch);
                         player.getWorld().spawnEntity(spawnLocation, EntityType.EVOKER_FANGS);
                         ItemUtils.setDelay(20);
                     }

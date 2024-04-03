@@ -1,35 +1,57 @@
 package org.super89.supermegamod.magic;
 
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.HashMap;
 
 public class ReflectDamageEffect implements Listener {
-    TimerTask1 timerTask1 = new TimerTask1();
-    private double reflectDamagePercentage = 0.95;
-    private int reflectDamageDuration = 5 * 60 * 20; // 5 minutes
-    int a = 0;
-    private int reflectDamageTicksLeft;
+    private int reflectDamageDuration;
+
+
+    private HashMap<Player, Boolean> playerBooleanHashMap = new HashMap<Player, Boolean>();
 
     public void apply(Player player, double reflectDamagePercentage, int reflectDamageDuration) {
-        this.reflectDamagePercentage = reflectDamagePercentage;
-        this.reflectDamageDuration = reflectDamageDuration;
-        this.reflectDamageTicksLeft = reflectDamageDuration;
-        player.sendMessage("Reflect damage effect activated. Duration: " + reflectDamageDuration / 20 + " seconds.");
+        final int[] cd = {reflectDamageDuration};
+
+        playerBooleanHashMap.put(player, true);
+        BukkitTask task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (cd[0] <= 0) {
+                    this.cancel(); // останавливаешь шедулер
+                    // Отсчет закончился, удаляешь с hashmap
+                    playerBooleanHashMap.remove(player);
+                } else {
+                    cd[0]--;
+
+                }
+            }
+        }.runTaskTimer(Magic.getPlugin(), 0, 20L);
+
+        player.sendMessage("Reflect damage effect activated. Duration: " + reflectDamageDuration + " seconds.");
     }
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        timerTask1.timer(30000);
-        if (event.getEntity() instanceof Player && reflectDamageTicksLeft > 0 && timerTask1.getFlag()) {
+
+        if (event.getEntity() instanceof Player) {
+
             Player player = (Player) event.getEntity();
+            LivingEntity attacker = (LivingEntity) event.getDamager();
+            if(playerBooleanHashMap.get(player) != null){
             double damage = event.getDamage();
-            event.setDamage(damage * reflectDamagePercentage);
-            player.setLastDamage(damage * (1 - reflectDamagePercentage));
+            event.setDamage(damage * 0.05);
+            attacker.damage(damage*0.95);
 
 
 
+        }
         }
     }
 }
