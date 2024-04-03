@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReflectBook implements Listener {
-    private final ReflectDamageEffect reflectDamageEffect = new ReflectDamageEffect();
+
     public Map<Player, Long> activePlayers = new HashMap<>();
     public ItemStack createItem() {
         ItemStack item = new ItemStack(Material.BOOK); // Replace with desired item
