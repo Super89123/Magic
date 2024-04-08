@@ -10,10 +10,9 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 
 public class CustomPotion implements Listener {
-    Mana mana = new Mana(Magic.getPlugin());
+    ManaAndThirst manaAndThirst = new ManaAndThirst(Magic.getPlugin());
     @EventHandler
     public void brewevent(BrewEvent event1){
         ItemStack item = event1.getContents().getIngredient();
@@ -45,8 +44,8 @@ public class CustomPotion implements Listener {
         ItemStack item = event.getItem();
         if (item.getType() == Material.POTION && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 2026){
             Player player = event.getPlayer();
-            int addmana = mana.getNowPlayerMana(player)+2;
-            mana.setNowPlayerMana(player, Math.min(addmana, mana.getMaxPlayerMana(player)));
+            int addmana = manaAndThirst.getNowPlayerMana(player)+2;
+            manaAndThirst.setNowPlayerMana(player, Math.min(addmana, manaAndThirst.getMaxPlayerMana(player)));
 
 
 

@@ -1,9 +1,6 @@
 package org.super89.supermegamod.magic;
 
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,17 +11,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class FireBook implements Listener {
-    public void createFireParticlesAroundPlayer(Player player) {
-        Location loc = player.getLocation();
-        World world = loc.getWorld();
+    public void spawnFireParticlesAroundPlayer(Player player) {
+        World world = player.getWorld();
+        double playerX = player.getLocation().getX();
+        double playerY = player.getLocation().getY();
+        double playerZ = player.getLocation().getZ();
 
-        for (int x = -3; x <= 3; x++) {
-            for (int y = -3; y <= 3; y++) {
-                for (int z = -3; z <= 3; z++) {
-                    if (Math.sqrt(x * x + y * y + z * z) <= 3) {
-                        Location particleLoc = loc.add(x, y, z);
-                        world.playEffect(particleLoc, Effect.MOBSPAWNER_FLAMES, 20);
-                    }
+        for (double x = playerX - 3; x <= playerX + 3; x++) {
+            for (double y = playerY - 3; y <= playerY + 3; y++) {
+                for (double z = playerZ - 3; z <= playerZ + 3; z++) {
+                    Location loc = new Location(world, x, y, z);
+                    world.spawnParticle(Particle.FLAME, loc, 1);
                 }
             }
         }
@@ -35,9 +32,10 @@ public class FireBook implements Listener {
         ItemStack itemStack = e.getItem();
         if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 1011){
             Location playerLocation = player.getLocation();
+            spawnFireParticlesAroundPlayer(player);
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof LivingEntity) {
-                    createFireParticlesAroundPlayer(player);
+
                     entity.setFireTicks(100);
                     player.playSound(player, Sound.ENTITY_BLAZE_SHOOT, 100, 100);
                 }

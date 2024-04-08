@@ -1,20 +1,19 @@
 package org.super89.supermegamod.magic;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -33,7 +32,7 @@ import java.util.List;
 public final class Magic extends JavaPlugin implements Listener {
 
 
-    Mana mana = new Mana(this);
+    ManaAndThirst manaAndThirst = new ManaAndThirst(this);
     ReflectBook reflectBook = new ReflectBook();
     private static Magic plugin;
 
@@ -82,17 +81,16 @@ public final class Magic extends JavaPlugin implements Listener {
 
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
-        Bukkit.getPluginManager().registerEvents(mana, this);
-        Bukkit.getPluginManager().registerEvents(new Prokachka(this), this);
+        Bukkit.getPluginManager().registerEvents(manaAndThirst, this);
         Bukkit.getPluginManager().registerEvents(new CustomSword(this), this);
         Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(), this);
         Bukkit.getPluginManager().registerEvents(new MineBook(), this);
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
         Bukkit.getPluginManager().registerEvents(new InvetoryWithBooks(), this);
-        Bukkit.getPluginManager().registerEvents(new HealthBook(), this);
+
         Bukkit.getPluginManager().registerEvents(new ReflectBook(), this);
         Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
-        Bukkit.getPluginManager().registerEvents(new ResistanceBook(), this);
+
         Bukkit.getPluginManager().registerEvents(new WindBook(), this);
         Bukkit.getPluginManager().registerEvents(new FireBook(), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
@@ -107,6 +105,7 @@ public final class Magic extends JavaPlugin implements Listener {
         PersistentDataContainer container = paperMeta.getPersistentDataContainer();
         container.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 10000001);
         paperMeta.setCustomModelData(100000001);
+        paper.setAmount(5);
         paper.setItemMeta(paperMeta);
 
         StonecuttingRecipe recipe123 = new StonecuttingRecipe(NamespacedKey.minecraft("nether_star_to_paper"), paper, Material.NETHER_STAR);
@@ -177,7 +176,15 @@ public final class Magic extends JavaPlugin implements Listener {
                             e.printStackTrace();
                         }
                     }
+                    ItemStack item = player.getInventory().getItemInOffHand();
+                    if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010){
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 3, false,false,false));
+                    }
+                    if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005){
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 60, 20, false, false,false));
+                    }
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana + "\",\"color\":\"aqua\"}]");
+
 
                 }
             }
@@ -201,8 +208,8 @@ public final class Magic extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
         // Проверяем, что игрок правым кликом использовал книгу
-        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1000 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && mana.getNowPlayerMana(player)>=10) {
-            mana.setNowPlayerMana(player, mana.getNowPlayerMana(player)-10);
+        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1000 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && manaAndThirst.getNowPlayerMana(player)>=10) {
+            manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-10);
             // Получаем позицию, на которую игрок смотрит
             Location targetLocation = player.getTargetBlock(null, 100).getLocation();
 

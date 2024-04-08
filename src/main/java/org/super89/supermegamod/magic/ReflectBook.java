@@ -2,6 +2,7 @@ package org.super89.supermegamod.magic;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ public class ReflectBook implements Listener {
                 long endTime = System.currentTimeMillis() + 5 * 60 * 1000;
                 activePlayers.put(player, endTime);
                 player.sendMessage(ChatColor.GREEN + "Damage reflection activated for 5 minutes!");
+                player.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 100, 100);
             }
         }
     }

@@ -18,7 +18,7 @@ public class TeleportBook implements Listener {
     public TeleportBook(Magic plugin) {
         this.plugin = plugin;
     }
-    Mana mana = new Mana(Magic.getPlugin());
+    ManaAndThirst manaAndThirst = new ManaAndThirst(Magic.getPlugin());
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -29,9 +29,9 @@ public class TeleportBook implements Listener {
         if (item != null && item.getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1002) {
 
             // Проверяем, является ли название книги "Teleport Book"
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && mana.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && manaAndThirst.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
                 // Телепортируем игрока на 5 блоков по направлению курсора
-                mana.setNowPlayerMana(player, mana.getNowPlayerMana(player)-20);
+                manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-20);
                 Location location = player.getLocation();
                 Vector direction = location.getDirection().normalize().multiply(5);
                 Location teleportLocation = location.add(direction);
