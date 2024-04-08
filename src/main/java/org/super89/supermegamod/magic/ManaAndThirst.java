@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -87,19 +88,7 @@ public class ManaAndThirst implements Listener {
         }
         return a;
     }
-    public int getNowPlayerProkachka(Player player) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        int a = playerDataConfig.getInt(playerUUID + "." + "prokachka");
 
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return a;
-        }
     public int getMaxPlayerMana(Player player) {
         String playerUUID = player.getUniqueId().toString();
         File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
@@ -113,18 +102,7 @@ public class ManaAndThirst implements Listener {
         }
         return a;
     }
-    public void setNowPlayerProkachka(Player player, int prokachka) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        playerDataConfig.set(playerUUID + "." + "prokachka", prokachka);
 
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     public void setMaxPlayerMana(Player player, int maxmana) {
         String playerUUID = player.getUniqueId().toString();
         File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
@@ -175,10 +153,9 @@ public class ManaAndThirst implements Listener {
         if(item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta) {
             PotionMeta meta = (PotionMeta) item.getItemMeta();
             if(meta.getBasePotionType().equals(PotionType.WATER) || meta.getBasePotionType().equals(PotionType.AWKWARD) || meta.getBasePotionType().equals(PotionType.MUNDANE) && getNowPlayerThrist(player) < 20){
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60 * 20, 2));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60 * 20, 2));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60 * 20, 2));
-                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 2, 20));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 25 * 20, 2));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 25 * 20, 2));
+                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 1, 20));
 
             }
             if(meta.hasCustomModelData() && meta.getCustomModelData() == 1013 && getNowPlayerThrist(player) < 20){
@@ -186,4 +163,56 @@ public class ManaAndThirst implements Listener {
             }
         }
     }
+    public String calculatePlayerThirst(Player player){
+        switch (getNowPlayerThrist(player)){
+            case 0:
+                return "-1 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+            case 1:
+                return "0 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+            case 2:
+                return "1 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+            case 3:
+                return "1 0 -1 -1 -1 -1 -1 -1 -1 -1";
+            case 4:
+                return "1 1 -1 -1 -1 -1 -1 -1 -1 -1";
+            case 5:
+                return "1 1 0 -1 -1 -1 -1 -1 -1 -1";
+            case 6:
+                return "1 1 1 -1 -1 -1 -1 -1 -1 -1";
+            case 7:
+                return "1 1 1 0 -1 -1 -1 -1 -1 -1";
+            case 8:
+                return "1 1 1 1 -1 -1 -1 -1 -1 -1";
+            case 9:
+                return "1 1 1 1 0 -1 -1 -1 -1 -1";
+            case 10:
+                return "1 1 1 1 1 -1 -1 -1 -1 -1";
+            case  11:
+                return "1 1 1 1 1 0 -1 -1 -1 -1";
+            case  12:
+                return "1 1 1 1 1 1 -1 -1 -1 -1";
+            case 13:
+                return "1 1 1 1 1 1 0 -1 -1 -1";
+            case 14:
+                return "1 1 1 1 1 1 1 -1 -1 -1";
+            case 15:
+                return "1 1 1 1 1 1 1 0 -1 -1";
+            case 16:
+                return "1 1 1 1 1 1 1 1 -1 -1";
+            case 17:
+                return "1 1 1 1 1 1 1 1 0 -1";
+            case 18:
+                return "1 1 1 1 1 1 1 1 1 -1";
+            case 19:
+                return "1 1 1 1 1 1 1 1 1 0";
+            default:
+                return "1 1 1 1 1 1 1 1 1 1";
+        }
+
+    }
+    @EventHandler
+    public void playerDeath(PlayerDeathEvent event){
+        setNowPlayerThrist(event.getPlayer(), 20);
+    }
+
 }

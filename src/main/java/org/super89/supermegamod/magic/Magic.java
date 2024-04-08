@@ -34,6 +34,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
     ManaAndThirst manaAndThirst = new ManaAndThirst(this);
     ReflectBook reflectBook = new ReflectBook();
+    PufferManager pufferManager = new PufferManager();
     private static Magic plugin;
 
 
@@ -82,11 +83,12 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
         Bukkit.getPluginManager().registerEvents(manaAndThirst, this);
-        Bukkit.getPluginManager().registerEvents(new CustomSword(this), this);
+
         Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(), this);
         Bukkit.getPluginManager().registerEvents(new MineBook(), this);
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
         Bukkit.getPluginManager().registerEvents(new InvetoryWithBooks(), this);
+        Bukkit.getPluginManager().registerEvents(pufferManager, this);
 
         Bukkit.getPluginManager().registerEvents(new ReflectBook(), this);
         Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
@@ -127,19 +129,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.addRecipe(recipe1234);
 
 
-        ItemStack Hungry_sword = new ItemStack(Material.IRON_SWORD);
-        ItemMeta Hungry_swordMeta = Hungry_sword.getItemMeta();
-        Hungry_swordMeta.setCustomModelData(1488);
-        Hungry_swordMeta.setDisplayName(ChatColor.DARK_RED + "Ненасытный меч");
-        Hungry_sword.setItemMeta(Hungry_swordMeta);
-        ShapedRecipe Hungry_swordRecipe = new ShapedRecipe(Hungry_sword);
-        Hungry_swordRecipe.shape("BEB", "MSM", "BNB");
-        Hungry_swordRecipe.setIngredient('B', Material.BONE);
-        Hungry_swordRecipe.setIngredient('S', Material.IRON_SWORD);
-        Hungry_swordRecipe.setIngredient('E', Material.SPIDER_EYE);
-        Hungry_swordRecipe.setIngredient('M', Material.ROTTEN_FLESH);
-        Hungry_swordRecipe.setIngredient('N', Material.ENDER_PEARL);
-        Bukkit.addRecipe(Hungry_swordRecipe);
+
         plugin = this;
 
 
@@ -160,15 +150,9 @@ public final class Magic extends JavaPlugin implements Listener {
                     int maxmana = playerDataConfig.getInt(uuid + "." + "maxmana");
                     int nowmana = playerDataConfig.getInt(uuid + "." + "nowmana");
                     int add = 0;
-                    if(nowmana<maxmana){
-                        int newmana = (int) (maxmana * 0.05);
-                        if(newmana+nowmana > maxmana){
-                            add = maxmana;
-                        }
-                        else {
-                            add = newmana+nowmana;
-
-                        }
+                    if(nowmana<75){
+                        int newmana = (int) (maxmana * 0.01);
+                        add = Math.min(newmana + nowmana, maxmana);
                         playerDataConfig.set(uuid + "." + "nowmana", add);
                         try {
                             playerDataConfig.save(playerDataFile);
@@ -178,12 +162,15 @@ public final class Magic extends JavaPlugin implements Listener {
                     }
                     ItemStack item = player.getInventory().getItemInOffHand();
                     if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 3, false,false,false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 50, 4, false,false,false));
                     }
                     if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 60, 20, false, false,false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false,false));
                     }
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana + "\",\"color\":\"aqua\"}]");
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"                 "+manaAndThirst.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
+                    if(manaAndThirst.getNowPlayerThrist(player) == 0){
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 5, false, false, false));
+                    }
 
 
                 }
@@ -201,6 +188,19 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0, 20);
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                if(Bukkit.getOnlinePlayers().isEmpty()){
+                    return;
+                }
+                for (Player player : Bukkit.getOnlinePlayers()){
+                    if(manaAndThirst.getNowPlayerThrist(player) > 0) {
+                        manaAndThirst.setNowPlayerThrist(player, manaAndThirst.getNowPlayerThrist(player) - 1);
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0, 20*60);
     }
 
     @EventHandler
