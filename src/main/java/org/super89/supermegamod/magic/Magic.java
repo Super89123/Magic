@@ -6,13 +6,16 @@ import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,6 +31,7 @@ import org.bukkit.inventory.StonecuttingRecipe;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public final class Magic extends JavaPlugin implements Listener {
 
@@ -36,6 +40,8 @@ public final class Magic extends JavaPlugin implements Listener {
     ReflectBook reflectBook = new ReflectBook();
     PufferManager pufferManager = new PufferManager();
     private static Magic plugin;
+    private FileConfiguration config;
+    private File configFile;
 
 
 
@@ -130,6 +136,12 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
 
+        configFile = new File(getDataFolder(), "puffers.yml");
+        config = YamlConfiguration.loadConfiguration(configFile);
+        loadInventories();
+
+
+
         plugin = this;
 
 
@@ -167,7 +179,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005){
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false,false));
                     }
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"                 "+manaAndThirst.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"ㅤㅤㅤㅤㅤ|ㅤㅤㅤㅤ"+manaAndThirst.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
                     if(manaAndThirst.getNowPlayerThrist(player) == 0){
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 5, false, false, false));
                     }
@@ -201,6 +213,10 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0, 20*60);
+    }
+    @Override
+    public void onDisable(){
+        saveInventories();
     }
 
     @EventHandler
@@ -287,6 +303,63 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0L, 10L); // Запускаем задачу с интервалом 10 тиков (0.5 секунды)
+    }
+    private String locationToString(Location location) {
+        return location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
+    }
+
+    private Location locationFromString(String string) {
+        String[] parts = string.split(";");
+        if (parts.length == 4) {
+            return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        }
+        return null;
+    }
+    public void loadInventories() {
+        for (String key : config.getKeys(false)) {
+            Location location = locationFromString(key);
+            if (location != null) {
+                ItemStack[] contents = ((List<ItemStack>) config.get(key)).toArray(new ItemStack[0]);
+                Inventory inventory = Bukkit.createInventory(null, 45, "Очиститель " + location.getBlockZ() +" "+ location.getBlockY() +" "+ location.getBlockZ());
+                inventory.setContents(contents);
+                pufferManager.pufferInventories.put(location, inventory);
+            }
+        }
+    }
+    public void saveInventories() {
+        for (Map.Entry<Location, Inventory> entry : pufferManager.pufferInventories.entrySet()) {
+            Location location = entry.getKey();
+            Inventory inventory = entry.getValue();
+            config.set(locationToString(location), inventory.getContents());
+        }
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public  void removeInventoryFromFile(Location location) {
+        config.set(locationToString(location), null);
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @EventHandler
+    public void onNoteBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        if (block.getType() == Material.NOTE_BLOCK && pufferManager.pufferInventories.containsKey(block.getLocation())) {
+            // Выбрасываем содержимое инвентаря
+            Inventory inventory = pufferManager.pufferInventories.remove(block.getLocation());
+            removeInventoryFromFile(block.getLocation());
+            Location location = block.getLocation();
+            for (ItemStack item : inventory.getContents()) {
+                if (item != null) {
+                    location.getWorld().dropItemNaturally(location, item);
+                }
+            }
+        }
     }
     public static Magic getPlugin() {
         return plugin;

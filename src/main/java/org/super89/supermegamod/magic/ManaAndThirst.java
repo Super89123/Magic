@@ -154,7 +154,7 @@ public class ManaAndThirst implements Listener {
             PotionMeta meta = (PotionMeta) item.getItemMeta();
             if(meta.getBasePotionType().equals(PotionType.WATER) || meta.getBasePotionType().equals(PotionType.AWKWARD) || meta.getBasePotionType().equals(PotionType.MUNDANE) && getNowPlayerThrist(player) < 20){
                 player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 25 * 20, 2));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 25 * 20, 2));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 25 * 20, 2));
                 setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 1, 20));
 
             }
