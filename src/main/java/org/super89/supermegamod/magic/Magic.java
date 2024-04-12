@@ -13,7 +13,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -27,11 +30,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import org.bukkit.inventory.StonecuttingRecipe;
+import org.super89.supermegamod.magic.Utils.ItemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class Magic extends JavaPlugin implements Listener {
 
@@ -320,7 +325,7 @@ public final class Magic extends JavaPlugin implements Listener {
             Location location = locationFromString(key);
             if (location != null) {
                 ItemStack[] contents = ((List<ItemStack>) config.get(key)).toArray(new ItemStack[0]);
-                Inventory inventory = Bukkit.createInventory(null, 45, "Очиститель " + location.getBlockZ() +" "+ location.getBlockY() +" "+ location.getBlockZ());
+                Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + location.getBlockZ() +" "+ location.getBlockY() +" "+ location.getBlockZ());
                 inventory.setContents(contents);
                 pufferManager.pufferInventories.put(location, inventory);
             }
@@ -353,13 +358,133 @@ public final class Magic extends JavaPlugin implements Listener {
             // Выбрасываем содержимое инвентаря
             Inventory inventory = pufferManager.pufferInventories.remove(block.getLocation());
             removeInventoryFromFile(block.getLocation());
+
             Location location = block.getLocation();
             for (ItemStack item : inventory.getContents()) {
-                if (item != null) {
+                if ((item != null) || !item.getType().equals(Material.LIME_WOOL) || !item.getType().equals(Material.RED_WOOL) || !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) ||!item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
                     location.getWorld().dropItemNaturally(location, item);
                 }
             }
         }
+    }
+    @EventHandler
+    public void onNoteBlockPlace(BlockPlaceEvent event) {
+        Block block = event.getBlockPlaced();
+        if (block.getType() == Material.NOTE_BLOCK) {
+            // Создаём инвентарь для нотного блока
+            Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
+
+            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
+            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+
+            inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+            inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+
+            inventory.setItem(11, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+            inventory.setItem(9, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+            inventory.setItem(18, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+            inventory.setItem(19, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+            inventory.setItem(20, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+            for(int i = 0; i < 54; i++){
+
+                if(i != 10 && i != 12 && i != 21 && i != 30 && i != 37){
+                    inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
+
+                }
+            }
+
+            pufferManager.pufferInventories.put(block.getLocation(), inventory);
+        }
+    }
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+
+
+    public Inventory getPufferInventory(Block noteBlock) {
+        return pufferManager.pufferInventories.get(noteBlock.getLocation());
+    }
+    @EventHandler
+    public void onPlayerInteract1(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+            Block noteBlock =  event.getClickedBlock();
+            Inventory inventory = getPufferInventory(noteBlock);
+            event.getPlayer().openInventory(inventory);
+
+
+
+
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void invclick(InventoryClickEvent event){
+        Player player = (Player) event.getWhoClicked();
+
+        Inventory inventory = event.getClickedInventory();
+        if (pufferManager.pufferInventories.containsValue(event.getClickedInventory())) {
+            Location location = getKeyByValue(pufferManager.pufferInventories, inventory);
+            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.GREEN_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
+                event.setCancelled(true);
+
+
+
+
+            }
+            int slot = 10;
+            if(event.getCursor() != null){
+                if (event.getSlot() == slot && Objects.requireNonNull(event.getCursor()).getType().equals(Material.WATER_BUCKET)) {
+                    assert inventory != null;
+                    if (Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.RED_WOOL)) {
+                        inventory.setItem(10, new ItemStack(Material.BUCKET));
+                        inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
+                        event.setCursor(new ItemStack(Material.AIR));
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if (Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL)) {
+                        inventory.setItem(10, new ItemStack(Material.BUCKET));
+                        inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
+                        event.setCursor(new ItemStack(Material.AIR));
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if (Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL) && Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL)) {
+                        inventory.setItem(10, new ItemStack(Material.BUCKET));
+                        inventory.setItem(12, ItemUtils.create(Material.LIME_WOOL, " "));
+                        event.setCursor(new ItemStack(Material.AIR));
+                        event.setCancelled(true);
+                        return;
+
+                    }
+
+                    pufferManager.pufferInventories.replace(location, inventory);
+
+                }
+
+                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.BUCKET) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL)){
+                    player.getInventory().addItem(event.getCurrentItem());
+                    inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+                    event.setCursor(new ItemStack(Material.AIR));
+                    event.setCurrentItem(ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+
+                    event.setCancelled(true);
+
+                }
+
+            }
+
+
+
+        }
+
     }
     public static Magic getPlugin() {
         return plugin;
