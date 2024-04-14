@@ -25,12 +25,11 @@ public class TeleportBook implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        // Проверяем, является ли предмет книгой
         if (item != null && item.getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1002) {
 
-            // Проверяем, является ли название книги "Teleport Book"
+
             if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && manaAndThirst.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
-                // Телепортируем игрока на 5 блоков по направлению курсора
+
                 manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-20);
                 Location location = player.getLocation();
                 Vector direction = location.getDirection().normalize().multiply(5);

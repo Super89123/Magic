@@ -22,8 +22,8 @@ public class EvokerFangsBook implements Listener {
 
                 double yaw = player.getLocation().getYaw();
                 double pitch = player.getLocation().getPitch();
-                double radius = 0.5; // Adjust the radius as needed
-                int numFangs = 20; // Adjust the number of fangs as needed
+                double radius = 0.5;
+                int numFangs = 20;
                 if(event.getClickedBlock() != null) {
 
                     Location blockLocation = event.getClickedBlock().getLocation();
@@ -35,7 +35,7 @@ public class EvokerFangsBook implements Listener {
                         double z = blockLocation.getZ() + radius * Math.sin(angle) + direction.getZ() * i;
                         Location spawnLocation = new Location(player.getWorld(), x, blockLocation.getY()+1, z, (float) yaw, (float) pitch);
                         player.getWorld().spawnEntity(spawnLocation, EntityType.EVOKER_FANGS);
-                        ItemUtils.setDelay(20);
+
                     }
                 }
             }

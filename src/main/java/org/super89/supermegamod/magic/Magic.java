@@ -100,6 +100,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
         Bukkit.getPluginManager().registerEvents(new InvetoryWithBooks(), this);
         Bukkit.getPluginManager().registerEvents(pufferManager, this);
+        Bukkit.getPluginManager().registerEvents(new ShieldThings(), this);
 
         Bukkit.getPluginManager().registerEvents(new ReflectBook(), this);
         Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
@@ -127,7 +128,6 @@ public final class Magic extends JavaPlugin implements Listener {
 
         ItemStack rabbit_foot = new ItemStack(Material.RABBIT_FOOT);
 
-        // Set the custom model data on the paper
         ItemMeta rabrMeta = rabbit_foot.getItemMeta();
         assert rabrMeta != null;
         PersistentDataContainer container1 = rabrMeta.getPersistentDataContainer();
@@ -228,24 +228,20 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        // Проверяем, что игрок правым кликом использовал книгу
+
         if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1000 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && manaAndThirst.getNowPlayerMana(player)>=10) {
             manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-10);
-            // Получаем позицию, на которую игрок смотрит
+
             Location targetLocation = player.getTargetBlock(null, 100).getLocation();
-
-            // Создаем куб из черных партиклов
             createParticleCube(targetLocation, 5, 5, 5, Particle.SCULK_SOUL);
-
-            // Замораживаем игроков, попавших в партиклы, и наносим им урон
             freezeAndDamagePlayersInParticles(targetLocation, 5, 5, 5, 3, 0.1, player.getWorld());
         }
     }
 
     private void createParticleCube(Location location, int width, int height, int depth, Particle particle) {
-        double offsetX = 0.5; // Смещение по X для центрирования куба
-        double offsetY = 0.5; // Смещение по Y для центрирования куба
-        double offsetZ = 0.5; // Смещение по Z для центрирования куба
+        double offsetX = 0.5;
+        double offsetY = 0.5;
+        double offsetZ = 0.5;
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -265,10 +261,9 @@ public final class Magic extends JavaPlugin implements Listener {
         List<LivingEntity> entities = world.getLivingEntities();
         for (LivingEntity player : entities ) {
             if (isPlayerInCube(player.getLocation(), location, width, height, depth)) {
-                // Замораживаем игрока на freezeDurationSeconds секунд
+
                 freezePlayer(player, freezeDurationSeconds);
 
-                // Наносим игроку урон damagePerSecond сердечка в секунду
                 damagePlayer(player, damagePerSecond, freezeDurationSeconds);
             }
         }
@@ -355,7 +350,7 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onNoteBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         if (block.getType() == Material.NOTE_BLOCK && pufferManager.pufferInventories.containsKey(block.getLocation())) {
-            // Выбрасываем содержимое инвентаря
+
             Inventory inventory = pufferManager.pufferInventories.remove(block.getLocation());
             removeInventoryFromFile(block.getLocation());
 
@@ -371,16 +366,17 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onNoteBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
         if (block.getType() == Material.NOTE_BLOCK) {
-            // Создаём инвентарь для нотного блока
+
             Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
 
             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+            inventory.setItem(25, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
 
             inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-
+            inventory.setItem(22, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(11, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
             inventory.setItem(9, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
             inventory.setItem(18, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
@@ -388,7 +384,7 @@ public final class Magic extends JavaPlugin implements Listener {
             inventory.setItem(20, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
             for(int i = 0; i < 54; i++){
 
-                if(i != 10 && i != 12 && i != 21 && i != 30 && i != 37){
+                if(i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25){
                     inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
 
                 }
@@ -469,7 +465,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
                 }
 
-                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.BUCKET) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL)){
+                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL)){
                     player.getInventory().addItem(event.getCurrentItem());
                     inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
                     event.setCursor(new ItemStack(Material.AIR));
@@ -477,6 +473,13 @@ public final class Magic extends JavaPlugin implements Listener {
 
                     event.setCancelled(true);
 
+                }
+                if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37){
+                    if(event.getSlot() == 37 && Objects.requireNonNull(event.getCursor()).getType().equals(Material.AMETHYST_SHARD) && (inventory.getItem(30).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.LIME_WOOL))){
+                        inventory.setItem(25, new ItemStack(Material.POTION) );
+
+
+                    }
                 }
 
             }

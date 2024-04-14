@@ -26,7 +26,7 @@ public class ExplosionBook implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        // Проверяем, является ли предмет книгой
+
         if (event.getAction().name().contains("RIGHT_CLICK") && item.getType() == Material.BOOK) {
             if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1001 && manaAndThirst.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
                 manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-25);
@@ -34,13 +34,12 @@ public class ExplosionBook implements Listener {
 
 
 
-                // Проверяем, является ли название книги "Explosion Book"
-                // Создаем взрыв в направлении курсора игрока
+
                 Location location = player.getLocation();
                 Vector direction = location.getDirection();
                 location.add(direction);
                 location.getWorld().createExplosion(location, 4.0f);
-                ItemMeta meta = item.getItemMeta();
+
 
             }
         }

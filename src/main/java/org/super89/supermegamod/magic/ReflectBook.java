@@ -19,14 +19,8 @@ import java.util.Map;
 public class ReflectBook implements Listener {
 
     public Map<Player, Long> activePlayers = new HashMap<>();
-    public ItemStack createItem() {
-        ItemStack item = new ItemStack(Material.BOOK); // Replace with desired item
-        ItemMeta meta = item.getItemMeta();
-        meta.setCustomModelData(1006);
-        meta.setDisplayName(ChatColor.AQUA + "Damage Reflector");
-        item.setItemMeta(meta);
-        return item;
-    }
+
+
 
 
     @EventHandler
@@ -36,7 +30,7 @@ public class ReflectBook implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (item != null && item.getType().equals(Material.BOOK) && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1006) {
-                // Activate the effect for 5 minutes
+
                 long endTime = System.currentTimeMillis() + 5 * 60 * 1000;
                 activePlayers.put(player, endTime);
                 player.sendMessage(ChatColor.GREEN + "Damage reflection activated for 5 minutes!");
@@ -51,12 +45,12 @@ public class ReflectBook implements Listener {
             LivingEntity attacker = (LivingEntity) event.getDamager();
 
             if (activePlayers.containsKey(defender) && System.currentTimeMillis() < activePlayers.get(defender)) {
-                // Reduce damage taken by defender
-                double damage = event.getDamage();
-                event.setDamage(damage * 0.05); // Defender takes only 5% damage
 
-                // Reflect damage back to attacker
-                attacker.damage(damage * 0.95); // Attacker takes 95% damage
+                double damage = event.getDamage();
+                event.setDamage(damage * 0.05);
+
+
+                attacker.damage(damage * 0.95);
             }
         }
     }

@@ -31,7 +31,6 @@ public class FireBook implements Listener {
         Player player = e.getPlayer();
         ItemStack itemStack = e.getItem();
         if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 1011){
-            Location playerLocation = player.getLocation();
             spawnFireParticlesAroundPlayer(player);
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof LivingEntity) {

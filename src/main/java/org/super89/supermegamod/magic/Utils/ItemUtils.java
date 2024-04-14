@@ -43,19 +43,6 @@ public class ItemUtils {
     public static ItemStack create(Material material, String displayName, int amount,byte data){
         return create(material,amount,data,displayName,null,null,null,null);
     }
-    public static ItemStack CreatePlayerHead(String playerUUID) {
-        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta headMeta = (SkullMeta) playerHead.getItemMeta();
 
-        headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(playerUUID));
-        playerHead.setItemMeta(headMeta);
-        return playerHead;
-    }
-    public static void setDelay(int delayTicks){
-        Magic.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(Magic.getPlugin(), new Runnable() {
-            public void run() {
-                // Your code here to handle the delayed event
-            }
-        }, delayTicks);
-    }
+
 }
