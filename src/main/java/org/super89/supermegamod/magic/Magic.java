@@ -476,7 +476,12 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
                 if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37){
                     if(event.getSlot() == 37 && Objects.requireNonNull(event.getCursor()).getType().equals(Material.AMETHYST_SHARD) && (inventory.getItem(30).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.LIME_WOOL))){
-                        inventory.setItem(25, new ItemStack(Material.POTION) );
+                        ItemStack itemStack = event.getCursor();
+                        itemStack.setAmount(event.getCursor().getAmount()-1);
+                        inventory.setItem(25, new ItemStack(Material.POTION));
+                        inventory.setItem(event.getSlot(), itemStack);
+                        event.setCancelled(true);
+
 
 
                     }
