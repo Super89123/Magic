@@ -16,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -205,6 +207,20 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0, 20);
+        new BukkitRunnable(){
+            @Override
+            public void run()
+            {
+                for (Player player : Bukkit.getOnlinePlayers()){
+                    int a = manaAndThirst.getNowPlayerState(player);
+                    if(a != -1){
+                        player.setSwimming(true);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 2, false,false,false));
+
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0, 1);
         new BukkitRunnable(){
             @Override
             public void run(){
@@ -433,6 +449,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
 
+
             }
             int slot = 10;
             if(event.getCursor() != null){
@@ -493,6 +510,28 @@ public final class Magic extends JavaPlugin implements Listener {
 
         }
 
+    }
+    @EventHandler
+    public void damageEvent(EntityDamageEvent event){
+        if(event.getEntity() instanceof Player){
+            Player player = (Player) event.getEntity();
+            if (player.getHealth() > 1) {
+            return;
+            }
+            if (player.getHealth() <= 1 && manaAndThirst.getNowPlayerState(player) == -1){
+                manaAndThirst.setNowPlayerPkm(player, 10);
+            }
+
+        }
+
+    }
+    @EventHandler
+    public void regenerationevent(EntityRegainHealthEvent event){
+        if(event.getEntity() instanceof Player);
+        Player player = (Player) event.getEntity();
+        if(manaAndThirst.getNowPlayerState(player) != -1){
+            event.setCancelled(true);
+        }
     }
     public static Magic getPlugin() {
         return plugin;

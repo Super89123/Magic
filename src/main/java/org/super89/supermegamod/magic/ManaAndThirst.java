@@ -88,6 +88,20 @@ public class ManaAndThirst implements Listener {
         }
         return a;
     }
+    public int getNowPlayerState(Player player) {
+        String playerUUID = player.getUniqueId().toString();
+        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
+        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
+        int a = playerDataConfig.getInt(playerUUID + "." + "ostatokprm");
+
+        try {
+            playerDataConfig.save(playerDataFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
 
     public int getMaxPlayerMana(Player player) {
         String playerUUID = player.getUniqueId().toString();
@@ -114,6 +128,18 @@ public class ManaAndThirst implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+        public void setNowPlayerPkm(Player player, int ostatokprm) {
+            String playerUUID = player.getUniqueId().toString();
+            File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
+            FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
+            playerDataConfig.set(playerUUID + "." + "ostatokprm", ostatokprm);
+
+            try {
+                playerDataConfig.save(playerDataFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
 
@@ -132,6 +158,7 @@ public class ManaAndThirst implements Listener {
             playerDataConfig.set(uuid + "." + "nowmana", 100);
             playerDataConfig.set(uuid + "." + "prokachka", 0);
             playerDataConfig.set(uuid + "." + "nowthrist", 20);
+            playerDataConfig.set(uuid + "." + "ostatokprm", -1);
             int slot = 17;
             try {
                 playerDataConfig.save(playerDataFile);
