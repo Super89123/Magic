@@ -1,5 +1,6 @@
 package org.super89.supermegamod.magic;
 
+import com.comphenix.protocol.wrappers.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -9,6 +10,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,8 +21,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -31,14 +37,19 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+
 import org.bukkit.inventory.StonecuttingRecipe;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.super89.supermegamod.magic.Utils.ItemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public final class Magic extends JavaPlugin implements Listener {
 
@@ -49,6 +60,9 @@ public final class Magic extends JavaPlugin implements Listener {
     private static Magic plugin;
     private FileConfiguration config;
     private File configFile;
+
+
+
 
 
 
@@ -213,14 +227,21 @@ public final class Magic extends JavaPlugin implements Listener {
             {
                 for (Player player : Bukkit.getOnlinePlayers()){
                     int a = manaAndThirst.getNowPlayerState(player);
+                    Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
+                    Block block  = location.getBlock();
                     if(a != -1){
-                        player.setSwimming(true);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10, 2, false,false,false));
+
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false,false,false));
 
                     }
+                    if(block.getType().equals(Material.BARRIER)){
+                        block.setType(Material.AIR);
+
+                    }
+
                 }
             }
-        }.runTaskTimer(plugin, 0, 1);
+        }.runTaskTimer(plugin, 0, 10);
         new BukkitRunnable(){
             @Override
             public void run(){
@@ -515,11 +536,11 @@ public final class Magic extends JavaPlugin implements Listener {
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
-            if (player.getHealth() > 1) {
+            if (player.getHealth()-event.getDamage() > 2) {
             return;
             }
-            if (player.getHealth() <= 1 && manaAndThirst.getNowPlayerState(player) == -1){
-                manaAndThirst.setNowPlayerPkm(player, 10);
+            if (player.getHealth()-event.getDamage() <= 2 && manaAndThirst.getNowPlayerState(player) == -1){
+                manaAndThirst.setNowPlayerPkm(player, 9);
             }
 
         }
@@ -527,12 +548,64 @@ public final class Magic extends JavaPlugin implements Listener {
     }
     @EventHandler
     public void regenerationevent(EntityRegainHealthEvent event){
-        if(event.getEntity() instanceof Player);
-        Player player = (Player) event.getEntity();
-        if(manaAndThirst.getNowPlayerState(player) != -1){
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+
+        if(manaAndThirst.getNowPlayerState(player) != -1) {
             event.setCancelled(true);
         }
+        }
     }
+    @EventHandler
+    public void clickevent(PlayerInteractEntityEvent event){
+        if(event.getRightClicked() instanceof Player){
+            Player player = (Player) event.getRightClicked();
+            if(manaAndThirst.getNowPlayerState(player) != -1){
+                manaAndThirst.setNowPlayerPkm(player, manaAndThirst.getNowPlayerState(player) -1);
+                if(manaAndThirst.getNowPlayerState(player) == -1){
+                    player.setHealth(player.getHealth()+2);
+                }
+
+            }
+        }
+    }
+    @EventHandler
+    public void moveEvent(PlayerMoveEvent e){
+        Player player = e.getPlayer();
+        Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
+        int a = manaAndThirst.getNowPlayerState(player);
+        Block block  = location.getBlock();
+        if(a != -1 && block.getType() != Material.BARRIER){
+
+            block.setType(Material.BARRIER);
+        }
+
+    }
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (!(event.getEntity() instanceof Arrow)) return;
+        Arrow arrow = (Arrow) event.getEntity();
+        if (!(event.getEntity().getShooter() instanceof Player)) return; // Проверяем, что стрелок - игрок
+        Player shooter = (Player) event.getEntity().getShooter();
+
+        // Поиск ближайшей сущности
+        Entity nearbyEntity = arrow.getNearbyEntities(10, 10, 10).stream()
+                .filter(entity -> entity instanceof LivingEntity && entity != shooter) // Исключаем стрелка из поиска
+                .min(Comparator.comparingDouble(entity -> entity.getLocation().distance(arrow.getLocation())))
+                .orElse(null);
+
+        if (nearbyEntity != null) {
+            // Расчет вектора направления
+            @NotNull Vector direction = nearbyEntity.getLocation().subtract(arrow.getLocation()).toVector().normalize();
+
+            // Применение вектора к стреле
+            arrow.setVelocity(direction.multiply(2)); // Устанавливаем скорость
+
+            // (опционально) Добавление визуального эффекта
+            arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.2, 0.2, 0.2, 0.1);
+        }
+    }
+
     public static Magic getPlugin() {
         return plugin;
     }
