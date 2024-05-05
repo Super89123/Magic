@@ -1,31 +1,22 @@
 package org.super89.supermegamod.magic;
 
-import com.comphenix.protocol.wrappers.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.damage.DamageEffect;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -37,10 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 
 import org.bukkit.inventory.StonecuttingRecipe;
 import org.bukkit.util.Vector;
@@ -54,12 +41,14 @@ import java.util.*;
 public final class Magic extends JavaPlugin implements Listener {
 
 
-    ManaAndThirst manaAndThirst = new ManaAndThirst(this);
+    PlayerDataController playerDataController = new PlayerDataController(this);
     ReflectBook reflectBook = new ReflectBook();
     PufferManager pufferManager = new PufferManager();
     private static Magic plugin;
     private FileConfiguration config;
     private File configFile;
+
+    public  Map<Location, Block> BarrierBlocks = new HashMap<>();
 
 
 
@@ -109,12 +98,12 @@ public final class Magic extends JavaPlugin implements Listener {
 
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
-        Bukkit.getPluginManager().registerEvents(manaAndThirst, this);
+        Bukkit.getPluginManager().registerEvents(playerDataController, this);
 
         Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(), this);
         Bukkit.getPluginManager().registerEvents(new MineBook(), this);
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
-        Bukkit.getPluginManager().registerEvents(new InvetoryWithBooks(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryWithCoolThings(), this);
         Bukkit.getPluginManager().registerEvents(pufferManager, this);
         Bukkit.getPluginManager().registerEvents(new ShieldThings(), this);
 
@@ -182,7 +171,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
                     int maxmana = playerDataConfig.getInt(uuid + "." + "maxmana");
                     int nowmana = playerDataConfig.getInt(uuid + "." + "nowmana");
-                    int add = 0;
+                    int add;
                     if(nowmana<75){
                         int newmana = (int) (maxmana * 0.01);
                         add = Math.min(newmana + nowmana, maxmana);
@@ -200,8 +189,8 @@ public final class Magic extends JavaPlugin implements Listener {
                     if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005){
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false,false));
                     }
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"ㅤㅤㅤㅤㅤ|ㅤㅤㅤㅤ"+manaAndThirst.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
-                    if(manaAndThirst.getNowPlayerThrist(player) == 0){
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"ㅤㅤㅤㅤㅤ|ㅤㅤㅤㅤ"+ playerDataController.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
+                    if(playerDataController.getNowPlayerThrist(player) == 0){
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 5, false, false, false));
                     }
 
@@ -216,8 +205,16 @@ public final class Magic extends JavaPlugin implements Listener {
                 for (Player player : reflectBook.activePlayers.keySet()) {
                     if (currentTime >= reflectBook.activePlayers.get(player)) {
                         reflectBook.activePlayers.remove(player);
-                        player.sendMessage(ChatColor.RED + "Damage reflection effect expired!");
+                        player.sendMessage(ChatColor.RED + "Эффект шипов истек!");
                     }
+                }
+                for(Block block1  : BarrierBlocks.values()){
+                    block1.setType(Material.AIR);
+                    if(!BarrierBlocks.isEmpty()){
+                        BarrierBlocks.clear();
+
+                    }
+
                 }
             }
         }.runTaskTimer(this, 0, 20);
@@ -226,18 +223,23 @@ public final class Magic extends JavaPlugin implements Listener {
             public void run()
             {
                 for (Player player : Bukkit.getOnlinePlayers()){
-                    int a = manaAndThirst.getNowPlayerState(player);
+                    int a = playerDataController.getNowPlayerState(player);
                     Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
                     Block block  = location.getBlock();
                     if(a != -1){
 
                         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false,false,false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false,false,false));
 
                     }
-                    if(block.getType().equals(Material.BARRIER)){
-                        block.setType(Material.AIR);
 
+
+                    if(a != -1 && block.getType() != Material.BARRIER){
+
+                        block.setType(Material.BARRIER);
+                        BarrierBlocks.put(location, block);
                     }
+
 
                 }
             }
@@ -249,8 +251,8 @@ public final class Magic extends JavaPlugin implements Listener {
                     return;
                 }
                 for (Player player : Bukkit.getOnlinePlayers()){
-                    if(manaAndThirst.getNowPlayerThrist(player) > 0) {
-                        manaAndThirst.setNowPlayerThrist(player, manaAndThirst.getNowPlayerThrist(player) - 1);
+                    if(playerDataController.getNowPlayerThrist(player) > 0) {
+                        playerDataController.setNowPlayerThrist(player, playerDataController.getNowPlayerThrist(player) - 1);
                     }
                 }
             }
@@ -266,8 +268,8 @@ public final class Magic extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
 
-        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1000 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && manaAndThirst.getNowPlayerMana(player)>=10) {
-            manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-10);
+        if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1000 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && playerDataController.getNowPlayerMana(player)>=10) {
+            playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-10);
 
             Location targetLocation = player.getTargetBlock(null, 100).getLocation();
             createParticleCube(targetLocation, 5, 5, 5, Particle.SCULK_SOUL);
@@ -403,22 +405,13 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onNoteBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
         if (block.getType() == Material.NOTE_BLOCK) {
-
             Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
-
             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(25, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-
             inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(22, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            inventory.setItem(11, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-            inventory.setItem(9, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-            inventory.setItem(18, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-            inventory.setItem(19, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-            inventory.setItem(20, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
             for(int i = 0; i < 54; i++){
 
                 if(i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25){
@@ -536,22 +529,51 @@ public final class Magic extends JavaPlugin implements Listener {
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
-            if (player.getHealth()-event.getDamage() > 2) {
+            if (player.getHealth()-event.getOriginalDamage(EntityDamageEvent.DamageModifier.ARMOR) > 2) {
             return;
             }
-            if (player.getHealth()-event.getDamage() <= 2 && manaAndThirst.getNowPlayerState(player) == -1){
-                manaAndThirst.setNowPlayerPkm(player, 9);
+            if (player.getHealth()-event.getOriginalDamage(EntityDamageEvent.DamageModifier.ARMOR) <= 2 && playerDataController.getNowPlayerState(player) == -1){
+                playerDataController.setNowPlayerPkm(player, 9);
+                new BukkitRunnable() {
+                    int ticks = 0;
+
+                    @Override
+                    public void run() {
+
+                        ticks++;
+
+                        if (ticks >= 60){
+                            if(playerDataController.getNowPlayerState(player) != -1) {
+                                player.damage(1024);
+                            }
+                            cancel();
+                        }
+                    }
+                }.runTaskTimer(this, 0L, 20L);
+            }            Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
+            if(playerDataController.getNowPlayerState(player) != -1 && event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
+                event.setCancelled(true);
             }
+
+
+
 
         }
 
+    }
+
+    @EventHandler
+    public void damage2(EntityDamageByBlockEvent event){
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+        }
     }
     @EventHandler
     public void regenerationevent(EntityRegainHealthEvent event){
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-        if(manaAndThirst.getNowPlayerState(player) != -1) {
+        if(playerDataController.getNowPlayerState(player) != -1) {
             event.setCancelled(true);
         }
         }
@@ -560,49 +582,66 @@ public final class Magic extends JavaPlugin implements Listener {
     public void clickevent(PlayerInteractEntityEvent event){
         if(event.getRightClicked() instanceof Player){
             Player player = (Player) event.getRightClicked();
-            if(manaAndThirst.getNowPlayerState(player) != -1){
-                manaAndThirst.setNowPlayerPkm(player, manaAndThirst.getNowPlayerState(player) -1);
-                if(manaAndThirst.getNowPlayerState(player) == -1){
+            if(playerDataController.getNowPlayerState(player) != -1){
+                event.getPlayer().playSound(event.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 100, 100);
+                playerDataController.setNowPlayerPkm(player, playerDataController.getNowPlayerState(player) -1);
+                if(playerDataController.getNowPlayerState(player) == -1){
                     player.setHealth(player.getHealth()+2);
+                    player.playSound(player, Sound.ENTITY_ENDER_DRAGON_GROWL, 100, 100);
+
                 }
 
             }
         }
     }
-    @EventHandler
-    public void moveEvent(PlayerMoveEvent e){
-        Player player = e.getPlayer();
-        Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
-        int a = manaAndThirst.getNowPlayerState(player);
-        Block block  = location.getBlock();
-        if(a != -1 && block.getType() != Material.BARRIER){
 
-            block.setType(Material.BARRIER);
-        }
-
-    }
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow)) return;
         Arrow arrow = (Arrow) event.getEntity();
-        if (!(event.getEntity().getShooter() instanceof Player)) return; // Проверяем, что стрелок - игрок
+        if (!(event.getEntity().getShooter() instanceof Player)) return;
         Player shooter = (Player) event.getEntity().getShooter();
+        if(shooter.getInventory().getItemInMainHand().hasItemMeta() && shooter.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW) && shooter.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && shooter.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1449){
 
-        // Поиск ближайшей сущности
         Entity nearbyEntity = arrow.getNearbyEntities(10, 10, 10).stream()
                 .filter(entity -> entity instanceof LivingEntity && entity != shooter) // Исключаем стрелка из поиска
                 .min(Comparator.comparingDouble(entity -> entity.getLocation().distance(arrow.getLocation())))
                 .orElse(null);
-
         if (nearbyEntity != null) {
-            // Расчет вектора направления
             @NotNull Vector direction = nearbyEntity.getLocation().subtract(arrow.getLocation()).toVector().normalize();
-
-            // Применение вектора к стреле
-            arrow.setVelocity(direction.multiply(2)); // Устанавливаем скорость
-
-            // (опционально) Добавление визуального эффекта
+            arrow.setVelocity(direction.multiply(2));
             arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.2, 0.2, 0.2, 0.1);
+        }
+        }
+
+    }
+    @EventHandler
+    public void deathEvenet(PlayerDeathEvent event){
+        Player player = event.getPlayer();
+        playerDataController.setNowPlayerPkm(player, -1);
+    }
+    @EventHandler
+    public void targetEvent(EntityTargetLivingEntityEvent event){
+        if(event.getTarget() instanceof Player){
+            Player player = (Player) event.getTarget();
+            if(playerDataController.getNowPlayerState(player) != -1){
+                event.setCancelled(true);
+            }
+        }
+    }
+    @EventHandler
+    public void onPotionSplash(PotionSplashEvent event) {
+        ThrownPotion potion = event.getPotion();
+        @NotNull Collection<PotionEffect> effectType = potion.getEffects();
+
+        if (effectType.contains(PotionEffectType.HEAL)) {
+            for (LivingEntity entity : event.getAffectedEntities()) {
+                if (entity instanceof Player) {
+                    Player player = (Player) entity;
+                    playerDataController.setNowPlayerPkm(player, -1);
+
+                }
+            }
         }
     }
 

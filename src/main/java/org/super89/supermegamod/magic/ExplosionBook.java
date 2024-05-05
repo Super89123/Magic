@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
@@ -19,7 +18,7 @@ public class ExplosionBook implements Listener {
     public ExplosionBook(Magic plugin) {
         this.plugin = plugin;
     }
-    ManaAndThirst manaAndThirst = new ManaAndThirst(Magic.getPlugin());
+    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
 
 
     @EventHandler
@@ -28,8 +27,8 @@ public class ExplosionBook implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (event.getAction().name().contains("RIGHT_CLICK") && item.getType() == Material.BOOK) {
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1001 && manaAndThirst.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
-                manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-25);
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1001 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
+                playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-25);
 
 
 

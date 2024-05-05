@@ -1,7 +1,5 @@
 package org.super89.supermegamod.magic;
 
-import org.bukkit.Material;
-import org.bukkit.PortalType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -12,18 +10,16 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
-public class ManaAndThirst implements Listener {
+public class PlayerDataController implements Listener {
     private Magic plugin;
-    public ManaAndThirst(Magic plugin){this.plugin=plugin;}
+    public PlayerDataController(Magic plugin){this.plugin=plugin;}
 
 
     public int getNowPlayerMana(Player player) {

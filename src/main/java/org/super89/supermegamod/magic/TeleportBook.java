@@ -18,7 +18,7 @@ public class TeleportBook implements Listener {
     public TeleportBook(Magic plugin) {
         this.plugin = plugin;
     }
-    ManaAndThirst manaAndThirst = new ManaAndThirst(Magic.getPlugin());
+    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -28,9 +28,9 @@ public class TeleportBook implements Listener {
         if (item != null && item.getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1002) {
 
 
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && manaAndThirst.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
 
-                manaAndThirst.setNowPlayerMana(player, manaAndThirst.getNowPlayerMana(player)-20);
+                playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-20);
                 Location location = player.getLocation();
                 Vector direction = location.getDirection().normalize().multiply(5);
                 Location teleportLocation = location.add(direction);
