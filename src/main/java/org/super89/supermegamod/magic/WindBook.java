@@ -21,7 +21,7 @@ public class WindBook implements Listener {
                 Location playerLocation = player.getLocation();
                 Location entityLocation = entity.getLocation();
                 Vector direction = playerLocation.toVector().subtract(entityLocation.toVector()).normalize();
-                Vector knockbackVelocity = direction.multiply(30);
+                Vector knockbackVelocity = direction.multiply(-30);
                 entity.setVelocity(knockbackVelocity);
 
 

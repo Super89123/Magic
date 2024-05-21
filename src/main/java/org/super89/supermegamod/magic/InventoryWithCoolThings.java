@@ -10,11 +10,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+
 public class InventoryWithCoolThings implements Listener {
     public void OpenInventory(Player player){
 
         if(player.hasPermission("minecraft.*")) {
-            Inventory inventory = Bukkit.createInventory(null, 54, "Все книги");
+            Inventory inventory = Bukkit.createInventory(null, 54, "Debug Table");
             setItem(Material.BOOK, 1000, inventory, 0, "Книга Стана");
             setItem(Material.BOOK, 1002, inventory, 1, "Книга телепорта");
             setItem(Material.BOOK, 1230, inventory, 2, "Книга левитации");
@@ -28,7 +30,8 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.BOOK, 1010, inventory, 10, "Книга Защиты");
             setItem(Material.BOOK, 1011, inventory, 11, "Книга Огня");
             setItem(Material.BOOK, 1012, inventory, 12, "Книга Ветра");
-            setItem(Material.CROSSBOW, 1449, inventory, 13, "Арболет ХАОСА");
+            setItem(Material.CROSSBOW, 1449, inventory, 13, "Автоматон");
+            setItem(Material.BOOK, 1059, inventory, 14, "Книга вардена");
 
             player.openInventory(inventory);
 
@@ -39,6 +42,10 @@ public class InventoryWithCoolThings implements Listener {
         ItemMeta meta = item.getItemMeta();
         meta.setCustomModelData(custommodeldata);
         meta.setDisplayName("§f" + s);
+
+        ArrayList<String> lore = new ArrayList<String>();
+        lore.add("§fCustom Model Data "+ custommodeldata);
+        meta.setLore(lore);
         item.setItemMeta(meta);
         inv.setItem(slot, item);
 

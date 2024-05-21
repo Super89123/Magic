@@ -74,6 +74,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.addRecipe(shapedRecipe);
 
         getServer().getPluginManager().registerEvents(new LevitationBook(), this);
+        getServer().getPluginManager().registerEvents(new SonicBook(), this);
 
         TeleportBookMeta.setCustomModelData(1002);
         TeleportBookMeta.setDisplayName(ChatColor.DARK_PURPLE + "Книга Телепорта");
