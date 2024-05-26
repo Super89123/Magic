@@ -2,6 +2,7 @@ package org.super89.supermegamod.magic;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,6 +39,7 @@ public class ExplosionBook implements Listener {
                 Vector direction = location.getDirection();
                 location.add(direction);
                 location.getWorld().createExplosion(location, 4.0f);
+                player.playSound(player, Sound.ENTITY_CREEPER_PRIMED, 100, 100);
 
 
             }

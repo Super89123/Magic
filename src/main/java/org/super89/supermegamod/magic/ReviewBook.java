@@ -1,6 +1,8 @@
 package org.super89.supermegamod.magic;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +23,7 @@ public class ReviewBook implements Listener {
                 player.teleport(worldSpawn);
             }
             playerDataController.setNowPlayerMana(player, 0);
+            player.playSound((Entity) player, Sound.BLOCK_PORTAL_TRAVEL, 100, 100);
         }
     }
 }

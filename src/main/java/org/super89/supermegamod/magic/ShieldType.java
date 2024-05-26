@@ -1,9 +1,8 @@
 package org.super89.supermegamod.magic;
 
 public enum ShieldType {
-    WOODEN(1, 2),
-    IRON(2, 4),
-    DIAMOND(3, 6);
+    NETHERITE(1020, 12),
+    IRON(1021, 7);
     // Здесь могла быть ваша реклама
 
     private final int modelData;

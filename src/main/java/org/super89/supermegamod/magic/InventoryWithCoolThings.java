@@ -1,5 +1,12 @@
 package org.super89.supermegamod.magic;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,9 +17,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+
 import java.util.ArrayList;
 
 public class InventoryWithCoolThings implements Listener {
+
+
+
     public void OpenInventory(Player player){
 
         if(player.hasPermission("minecraft.*")) {
@@ -31,7 +42,10 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.BOOK, 1011, inventory, 11, "Книга Огня");
             setItem(Material.BOOK, 1012, inventory, 12, "Книга Ветра");
             setItem(Material.CROSSBOW, 1449, inventory, 13, "Автоматон");
-            setItem(Material.BOOK, 1059, inventory, 14, "Книга вардена");
+            setItem(Material.SHIELD, 1020, inventory, 14, "Незеритовый щит");
+            setItem(Material.SHIELD, 1021, inventory, 15, "Железный щит");
+            setItem(Material.POTION, 2026, inventory, 16, "§bЗелье Маны");
+
 
             player.openInventory(inventory);
 
@@ -44,13 +58,14 @@ public class InventoryWithCoolThings implements Listener {
         meta.setDisplayName("§f" + s);
 
         ArrayList<String> lore = new ArrayList<String>();
-        lore.add("§fCustom Model Data "+ custommodeldata);
+        lore.add("§fCustom Model Data: "+ custommodeldata);
         meta.setLore(lore);
         item.setItemMeta(meta);
         inv.setItem(slot, item);
 
 
     }
+
     @EventHandler
     public void PlayerInteractE(PlayerInteractEvent event){
         Player player = event.getPlayer();

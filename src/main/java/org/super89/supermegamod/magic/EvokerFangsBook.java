@@ -1,6 +1,7 @@
 package org.super89.supermegamod.magic;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -36,7 +37,9 @@ public class EvokerFangsBook implements Listener {
                         Location spawnLocation = new Location(player.getWorld(), x, blockLocation.getY()+1, z, (float) yaw, (float) pitch);
                         player.getWorld().spawnEntity(spawnLocation, EntityType.EVOKER_FANGS);
 
+
                     }
+                    player.playSound((Entity) player, Sound.ENTITY_EVOKER_CELEBRATE, 100 , 100);
                 }
             }
         }

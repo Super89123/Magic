@@ -9,13 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ShieldThings implements Listener {
-    public ItemStack createShield(ShieldType type) {
-        ItemStack shield = new ItemStack(Material.SHIELD);
-        ItemMeta meta = shield.getItemMeta();
-        meta.setCustomModelData(type.getModelData());
-        shield.setItemMeta(meta);
-        return shield;
-    }
+
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
@@ -29,9 +23,11 @@ public class ShieldThings implements Listener {
 
                 // Если тип щита найден, уменьшаем урон
                 if (shieldType != null) {
-                    double damage = event.getDamage();
-                    double reducedDamage = Math.max(0, damage - shieldType.getDamageReduction());
-                    event.setDamage(reducedDamage);
+                    if(event.getDamage() > shieldType.getDamageReduction()){
+                        event.setDamage(event.getDamage());
+                    }
+
+
                 }
                 else{
                     if(event.getDamage() > 5){
