@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -24,14 +25,14 @@ public class ShieldThings implements Listener {
                 // Если тип щита найден, уменьшаем урон
                 if (shieldType != null) {
                     if(event.getDamage() > shieldType.getDamageReduction()){
-                        event.setDamage(event.getDamage());
+                        player.damage(event.getDamage());
                     }
 
 
                 }
                 else{
                     if(event.getDamage() > 5){
-                        event.setDamage(event.getDamage());
+                        player.damage(event.getDamage());
                     }
                 }
             }

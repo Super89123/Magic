@@ -45,6 +45,8 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.SHIELD, 1020, inventory, 14, "Незеритовый щит");
             setItem(Material.SHIELD, 1021, inventory, 15, "Железный щит");
             setItem(Material.POTION, 2026, inventory, 16, "§bЗелье Маны");
+            setItem(Material.RABBIT_FOOT, 2025, inventory, 17, "Лазуритовая пыль");
+            setItem(Material.PAPER, 4000, inventory, 18, "Звездная пыль");
 
 
             player.openInventory(inventory);

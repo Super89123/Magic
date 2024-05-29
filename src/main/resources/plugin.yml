@@ -1,4 +1,4 @@
-name: Magic
+name: Quantov
 version: '${project.version}'
 main: org.super89.supermegamod.magic.Magic
 api-version: '1.20'

@@ -1,5 +1,12 @@
 package org.super89.supermegamod.magic;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -119,12 +126,11 @@ public final class Magic extends JavaPlugin implements Listener {
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
         ItemStack paper = new ItemStack(Material.PAPER);
 
-        // Set the custom model data on the paper
         ItemMeta paperMeta = paper.getItemMeta();
         assert paperMeta != null;
         PersistentDataContainer container = paperMeta.getPersistentDataContainer();
         container.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 10000001);
-        paperMeta.setCustomModelData(100000001);
+        paperMeta.setCustomModelData(4000);
         paper.setAmount(5);
         paper.setItemMeta(paperMeta);
 
@@ -140,11 +146,11 @@ public final class Magic extends JavaPlugin implements Listener {
         container1.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 2025);
         rabrMeta.setCustomModelData(2025);
         rabbit_foot.setItemMeta(rabrMeta);
+        rabbit_foot.setAmount(5);
 
         StonecuttingRecipe recipe1234 = new StonecuttingRecipe(NamespacedKey.minecraft("lapis_lazuli_to_rabbit_foot"), rabbit_foot, Material.LAPIS_LAZULI);
 
         Bukkit.addRecipe(recipe1234);
-
 
 
         configFile = new File(getDataFolder(), "puffers.yml");
@@ -152,46 +158,49 @@ public final class Magic extends JavaPlugin implements Listener {
         loadInventories();
 
 
-
         plugin = this;
 
 
 
-
-        // Plugin startup logic
-
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(Bukkit.getOnlinePlayers().isEmpty()){
+                if (Bukkit.getOnlinePlayers().isEmpty()) {
                     return;
                 }
-                for (Player player : Bukkit.getOnlinePlayers()){
+                for (Player player : Bukkit.getOnlinePlayers()) {
                     String uuid = player.getUniqueId().toString();
                     File playerDataFile = new File(getPlugin(Magic.class).getDataFolder(), "playerdata.yml");
                     FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
                     int maxmana = playerDataConfig.getInt(uuid + "." + "maxmana");
                     int nowmana = playerDataConfig.getInt(uuid + "." + "nowmana");
                     int add;
-                    if(nowmana<75){
+                    if (nowmana < 75) {
                         int newmana = (int) (maxmana * 0.01);
                         add = Math.min(newmana + nowmana, maxmana);
                         playerDataConfig.set(uuid + "." + "nowmana", add);
                         try {
                             playerDataConfig.save(playerDataFile);
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                     ItemStack item = player.getInventory().getItemInOffHand();
-                    if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 50, 4, false,false,false));
+                    if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 50, 4, false, false, false));
                     }
-                    if(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false,false));
+                    if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+player.getName()+" actionbar [{\"text\":\"Мана:" + nowmana + "/"+ maxmana +"ㅤㅤㅤㅤㅤ|ㅤㅤㅤㅤ"+ playerDataController.calculatePlayerThirst(player)+"\",\"color\":\"aqua\"}]");
-                    if(playerDataController.getNowPlayerThrist(player) == 0){
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "       |       " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
+
+
+
+                    player.sendActionBar(actionbarMessage);
+
+
+
+                    if (playerDataController.getNowPlayerThrist(player) == 0) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 5, false, false, false));
                     }
 
@@ -209,55 +218,55 @@ public final class Magic extends JavaPlugin implements Listener {
                         player.sendMessage(ChatColor.RED + "Эффект шипов истек!");
                     }
                 }
-                for(Block block1  : BarrierBlocks.values()){
-                    block1.setType(Material.AIR);
-                    if(!BarrierBlocks.isEmpty()){
-                        BarrierBlocks.clear();
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (playerDataController.getNowPlayerState(player) != -1) {
+                        for (Block block1 : BarrierBlocks.values()) {
+                            BarrierBlocks.remove(block1.getLocation(), block1);
+                            block1.setType(Material.AIR);
 
+
+                        }
                     }
-
                 }
+
             }
         }.runTaskTimer(this, 0, 20);
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
-                for (Player player : Bukkit.getOnlinePlayers()){
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
                     int a = playerDataController.getNowPlayerState(player);
-                    Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
-                    Block block  = location.getBlock();
-                    if(a != -1){
+                    Location location = new Location(player.getWorld(), player.getX(), player.getY() + 1, player.getZ());
+                    Block block = location.getBlock();
+                    if (a != -1) {
 
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false,false,false));
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false,false,false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, false, false));
+                        if (block.getType() != Material.BARRIER) {
+                            block.setType(Material.BARRIER);
+                            BarrierBlocks.put(location, block);
+                        }
 
-                    }
 
-
-                    if(a != -1 && block.getType() != Material.BARRIER){
-
-                        block.setType(Material.BARRIER);
-                        BarrierBlocks.put(location, block);
                     }
 
 
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
-            public void run(){
-                if(Bukkit.getOnlinePlayers().isEmpty()){
+            public void run() {
+                if (Bukkit.getOnlinePlayers().isEmpty()) {
                     return;
                 }
-                for (Player player : Bukkit.getOnlinePlayers()){
-                    if(playerDataController.getNowPlayerThrist(player) > 0) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (playerDataController.getNowPlayerThrist(player) > 0) {
                         playerDataController.setNowPlayerThrist(player, playerDataController.getNowPlayerThrist(player) - 1);
                     }
                 }
             }
-        }.runTaskTimer(this, 0, 20*60);
+        }.runTaskTimer(this, 0, 20 * 60);
     }
     @Override
     public void onDisable(){
@@ -396,7 +405,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
             Location location = block.getLocation();
             for (ItemStack item : inventory.getContents()) {
-                if ((item != null) || !item.getType().equals(Material.LIME_WOOL) || !item.getType().equals(Material.RED_WOOL) || !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) ||!item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
+                if ((item != null) && !item.getType().equals(Material.LIME_WOOL) && !item.getType().equals(Material.RED_WOOL) && !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
                     location.getWorld().dropItemNaturally(location, item);
                 }
             }
@@ -497,12 +506,15 @@ public final class Magic extends JavaPlugin implements Listener {
 
                 }
 
-                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL)){
-                    player.getInventory().addItem(event.getCurrentItem());
-                    inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-                    event.setCursor(new ItemStack(Material.AIR));
-                    event.setCurrentItem(ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-
+                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCursor().getType().equals(Material.RED_WOOL)){
+                    if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37) {
+                        if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS)) {
+                            player.getInventory().addItem(ItemUtils.create(event.getCurrentItem().getType(), ""));
+                            inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+                            event.setCursor(new ItemStack(Material.AIR));
+                            event.setCurrentItem(ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+                        }
+                    }
                     event.setCancelled(true);
 
                 }
@@ -530,10 +542,10 @@ public final class Magic extends JavaPlugin implements Listener {
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
-            if (player.getHealth()-event.getOriginalDamage(EntityDamageEvent.DamageModifier.ARMOR) > 2) {
+            if (player.getHealth()-event.getDamage() > 2) {
             return;
             }
-            if (player.getHealth()-event.getOriginalDamage(EntityDamageEvent.DamageModifier.ARMOR) <= 2 && playerDataController.getNowPlayerState(player) == -1){
+            if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
                 new BukkitRunnable() {
                     int ticks = 0;
@@ -552,7 +564,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     }
                 }.runTaskTimer(this, 0L, 20L);
             }            Location location = new Location(player.getWorld(), player.getX(), player.getY()+1, player.getZ());
-            if(playerDataController.getNowPlayerState(player) != -1 && event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
+            if(playerDataController.getNowPlayerState(player) != -1 && (event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION) || event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) || event.getCause().equals(EntityDamageEvent.DamageCause.CONTACT))){
                 event.setCancelled(true);
             }
 
@@ -563,18 +575,13 @@ public final class Magic extends JavaPlugin implements Listener {
 
     }
 
-    @EventHandler
-    public void damage2(EntityDamageByBlockEvent event){
-        if(event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-        }
-    }
+
     @EventHandler
     public void regenerationevent(EntityRegainHealthEvent event){
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-        if(playerDataController.getNowPlayerState(player) != -1) {
+        if(playerDataController.getNowPlayerState(player) != -1 && !event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.MAGIC)) {
             event.setCancelled(true);
         }
         }
@@ -635,7 +642,7 @@ public final class Magic extends JavaPlugin implements Listener {
         ThrownPotion potion = event.getPotion();
         @NotNull Collection<PotionEffect> effectType = potion.getEffects();
 
-        if (effectType.contains(PotionEffectType.HEAL)) {
+        if (effectType.contains(PotionEffectType.HEALTH_BOOST) || effectType.contains(PotionEffectType.HEAL)) {
             for (LivingEntity entity : event.getAffectedEntities()) {
                 if (entity instanceof Player) {
                     Player player = (Player) entity;
