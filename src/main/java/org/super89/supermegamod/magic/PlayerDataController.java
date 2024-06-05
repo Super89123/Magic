@@ -1,5 +1,6 @@
 package org.super89.supermegamod.magic;
 
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -20,6 +22,11 @@ import java.io.IOException;
 public class PlayerDataController implements Listener {
     private Magic plugin;
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
+    String bottlefull3 = " ";
+    String bottlefull2 = " ";
+    String bottlefull = " ";
+
+
 
 
     public int getNowPlayerMana(Player player) {
@@ -181,55 +188,59 @@ public class PlayerDataController implements Listener {
                 setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 1, 20));
 
             }
-            if(meta.hasCustomModelData() && meta.getCustomModelData() == 1013 && getNowPlayerThrist(player) < 20){
+            if(meta.hasCustomModelData() && meta.getCustomModelData() == 2030 && getNowPlayerThrist(player) < 20){
                 setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 2, 20));
+            }
+            if(meta.hasCustomModelData() && meta.getCustomModelData() == 2031 && getNowPlayerThrist(player) < 20){
+                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 3, 20));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 100 * 20, 10, false,false,false));
             }
         }
     }
     public String calculatePlayerThirst(Player player){
         switch (getNowPlayerThrist(player)){
             case 0:
-                return "-1 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3+bottlefull3;
             case 1:
-                return "0 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull2;
             case 2:
-                return "1 -1 -1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull;
             case 3:
-                return "1 0 -1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull2+ bottlefull;
             case 4:
-                return "1 1 -1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3 +bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull+ bottlefull;
             case 5:
-                return "1 1 0 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3 +bottlefull3 +bottlefull3 +bottlefull3+ bottlefull2+ bottlefull+ bottlefull;
             case 6:
-                return "1 1 1 -1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3 +bottlefull3 +bottlefull3 +bottlefull3 +bottlefull3+ bottlefull3+ bottlefull+ bottlefull +bottlefull;
             case 7:
-                return "1 1 1 0 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3 +bottlefull3 +bottlefull3+bottlefull2+ bottlefull +bottlefull +bottlefull;
             case 8:
-                return "1 1 1 1 -1 -1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+bottlefull3+ bottlefull3+ bottlefull+ bottlefull+ bottlefull+ bottlefull;
             case 9:
-                return "1 1 1 1 0 -1 -1 -1 -1 -1";
+                return bottlefull3 +bottlefull3+ bottlefull3 +bottlefull3+ bottlefull3+ bottlefull2 +bottlefull+ bottlefull+ bottlefull+bottlefull;
             case 10:
-                return "1 1 1 1 1 -1 -1 -1 -1 -1";
+                return bottlefull3+bottlefull3 +bottlefull3 +bottlefull3 +bottlefull3+ bottlefull +bottlefull +bottlefull +bottlefull +bottlefull;
             case  11:
-                return "1 1 1 1 1 0 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+bottlefull3+ bottlefull3+ bottlefull2+ bottlefull+ bottlefull+ bottlefull+ bottlefull +bottlefull;
             case  12:
-                return "1 1 1 1 1 1 -1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull3+ bottlefull+ bottlefull +bottlefull+bottlefull+ bottlefull+ bottlefull;
             case 13:
-                return "1 1 1 1 1 1 0 -1 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull3+ bottlefull2+ bottlefull+ bottlefull+ bottlefull+ bottlefull+ bottlefull+ bottlefull;
             case 14:
-                return "1 1 1 1 1 1 1 -1 -1 -1";
+                return bottlefull3+ bottlefull3+bottlefull3+ bottlefull+ bottlefull+ bottlefull+ bottlefull+ bottlefull+ bottlefull+ bottlefull;
             case 15:
-                return "1 1 1 1 1 1 1 0 -1 -1";
+                return bottlefull3+ bottlefull3+ bottlefull2+ bottlefull+ bottlefull +bottlefull+ bottlefull+ bottlefull+ bottlefull+bottlefull;
             case 16:
-                return "1 1 1 1 1 1 1 1 -1 -1";
+                return bottlefull3+ bottlefull3+bottlefull+ bottlefull+ bottlefull+bottlefull+ bottlefull +bottlefull+ bottlefull+ bottlefull;
             case 17:
-                return "1 1 1 1 1 1 1 1 0 -1";
+                return bottlefull3+ bottlefull2+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
             case 18:
-                return "1 1 1 1 1 1 1 1 1 -1";
+                return bottlefull3+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
             case 19:
-                return "1 1 1 1 1 1 1 1 1 0";
+               return bottlefull2+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
             default:
-                return "1 1 1 1 1 1 1 1 1 1";
+                return bottlefull+bottlefull3+bottlefull3+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
         }
 
     }

@@ -51,6 +51,7 @@ public final class Magic extends JavaPlugin implements Listener {
     PlayerDataController playerDataController = new PlayerDataController(this);
     ReflectBook reflectBook = new ReflectBook();
     PufferManager pufferManager = new PufferManager();
+    InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
     private static Magic plugin;
     private FileConfiguration config;
     private File configFile;
@@ -143,7 +144,7 @@ public final class Magic extends JavaPlugin implements Listener {
         ItemMeta rabrMeta = rabbit_foot.getItemMeta();
         assert rabrMeta != null;
         PersistentDataContainer container1 = rabrMeta.getPersistentDataContainer();
-        container1.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 2025);
+        container1.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 2025);
         rabrMeta.setCustomModelData(2025);
         rabbit_foot.setItemMeta(rabrMeta);
         rabbit_foot.setAmount(5);
@@ -151,6 +152,32 @@ public final class Magic extends JavaPlugin implements Listener {
         StonecuttingRecipe recipe1234 = new StonecuttingRecipe(NamespacedKey.minecraft("lapis_lazuli_to_rabbit_foot"), rabbit_foot, Material.LAPIS_LAZULI);
 
         Bukkit.addRecipe(recipe1234);
+
+
+        ItemStack amethyst_dust = new ItemStack(Material.PAPER);
+        ItemMeta amethyst_dust_meta = amethyst_dust.getItemMeta();
+        assert amethyst_dust_meta != null;
+        PersistentDataContainer container2 = amethyst_dust_meta.getPersistentDataContainer();
+        container2.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 2029);
+        amethyst_dust_meta.setCustomModelData(2029);
+        amethyst_dust.setItemMeta(amethyst_dust_meta);
+        amethyst_dust.setAmount(3);
+        StonecuttingRecipe recipe12345 = new StonecuttingRecipe(NamespacedKey.minecraft("amethyst_dust"), amethyst_dust, Material.AMETHYST_SHARD);
+        Bukkit.addRecipe(recipe12345);
+
+        ItemStack prismarine_dust = new ItemStack(Material.PAPER);
+        ItemMeta prismarine_dust_meta = prismarine_dust.getItemMeta();
+        assert prismarine_dust_meta != null;
+        PersistentDataContainer container3 = prismarine_dust_meta.getPersistentDataContainer();
+        container3.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 2032);
+        prismarine_dust_meta.setCustomModelData(2032);
+        prismarine_dust.setItemMeta(prismarine_dust_meta);
+        prismarine_dust.setAmount(5);
+        StonecuttingRecipe recipe123456 = new StonecuttingRecipe(NamespacedKey.minecraft("prismarine_dust"), prismarine_dust, Material.PRISMARINE_SHARD);
+        Bukkit.addRecipe(recipe123456);
+
+
+
 
 
         configFile = new File(getDataFolder(), "puffers.yml");
@@ -192,7 +219,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "       |       " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + " " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
 
 
 
@@ -467,7 +494,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Inventory inventory = event.getClickedInventory();
         if (pufferManager.pufferInventories.containsValue(event.getClickedInventory())) {
             Location location = getKeyByValue(pufferManager.pufferInventories, inventory);
-            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.GREEN_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
+            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.LIME_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
                 event.setCancelled(true);
 
 
@@ -507,8 +534,8 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
 
                 if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCursor().getType().equals(Material.RED_WOOL)){
-                    if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37) {
-                        if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS)) {
+                    if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37 || event.getSlot() == 25) {
+                        if(inventory.getItem(event.getSlot()).getType() != Material.LIGHT_GRAY_STAINED_GLASS_PANE) {
                             player.getInventory().addItem(ItemUtils.create(event.getCurrentItem().getType(), ""));
                             inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
                             event.setCursor(new ItemStack(Material.AIR));
@@ -519,10 +546,12 @@ public final class Magic extends JavaPlugin implements Listener {
 
                 }
                 if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37){
-                    if(event.getSlot() == 37 && Objects.requireNonNull(event.getCursor()).getType().equals(Material.AMETHYST_SHARD) && (inventory.getItem(30).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.LIME_WOOL))){
+
+                    if(event.getSlot() == 37 && Objects.requireNonNull(event.getCursor()).getType().equals(Material.PAPER) && event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasCustomModelData() && event.getCursor().getItemMeta().getCustomModelData() == 2029 && (inventory.getItem(30).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.LIME_WOOL))){
                         ItemStack itemStack = event.getCursor();
-                        itemStack.setAmount(event.getCursor().getAmount()-1);
-                        inventory.setItem(25, new ItemStack(Material.POTION));
+                        event.setCursor(new ItemStack(Material.AIR));
+                        itemStack.setAmount(itemStack.getAmount()-1);
+                        inventoryWithCoolThings.setItem(Material.POTION, 2030, inventory, 25, "Очищеная вода");
                         inventory.setItem(event.getSlot(), itemStack);
                         event.setCancelled(true);
 
@@ -542,10 +571,10 @@ public final class Magic extends JavaPlugin implements Listener {
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
-            if (player.getHealth()-event.getDamage() > 2) {
+            if (player.getHealth()-event.getDamage(EntityDamageEvent.DamageModifier.ARMOR) > 2) {
             return;
             }
-            if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
+            if (player.getHealth()-event.getDamage(EntityDamageEvent.DamageModifier.ARMOR) <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
                 new BukkitRunnable() {
                     int ticks = 0;

@@ -33,12 +33,7 @@ public class CustomPotion implements Listener {
 
         }
     }
-    @EventHandler
-    public  void  Playerr(InventoryInteractEvent event){
-        if(event.getInventory() instanceof BrewerInventory){
-            BrewerInventory inventory = (BrewerInventory) event.getInventory();
-        }
-    }
+
     @EventHandler
     public void onPlayerDrink(PlayerItemConsumeEvent event){
         ItemStack item = event.getItem();
