@@ -539,7 +539,9 @@ public final class Magic extends JavaPlugin implements Listener {
                             player.getInventory().addItem(ItemUtils.create(event.getCurrentItem().getType(), ""));
                             inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
                             event.setCursor(new ItemStack(Material.AIR));
-                            event.setCurrentItem(ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+                            event.setCurrentItem(new ItemStack(Material.AIR));
+                            event.setCancelled(true);
+                            return;
                         }
                     }
                     event.setCancelled(true);
