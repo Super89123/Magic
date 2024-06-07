@@ -571,10 +571,10 @@ public final class Magic extends JavaPlugin implements Listener {
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
-            if (player.getHealth()-event.getDamage(EntityDamageEvent.DamageModifier.ARMOR) > 2) {
+            if (player.getHealth()-event.getDamage() > 2) {
             return;
             }
-            if (player.getHealth()-event.getDamage(EntityDamageEvent.DamageModifier.ARMOR) <= 2 && playerDataController.getNowPlayerState(player) == -1){
+            if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
                 new BukkitRunnable() {
                     int ticks = 0;
@@ -671,7 +671,7 @@ public final class Magic extends JavaPlugin implements Listener {
         ThrownPotion potion = event.getPotion();
         @NotNull Collection<PotionEffect> effectType = potion.getEffects();
 
-        if (effectType.contains(PotionEffectType.HEALTH_BOOST) || effectType.contains(PotionEffectType.HEAL)) {
+        if (effectType.contains(PotionEffectType.HEALTH_BOOST) || effectType.contains(PotionEffectType.HEAL) || effectType.contains(PotionEffectType.REGENERATION)) {
             for (LivingEntity entity : event.getAffectedEntities()) {
                 if (entity instanceof Player) {
                     Player player = (Player) entity;

@@ -22,9 +22,9 @@ import java.io.IOException;
 public class PlayerDataController implements Listener {
     private Magic plugin;
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
-    String bottlefull3 = " ";
-    String bottlefull2 = " ";
-    String bottlefull = " ";
+    String bottlefull3 = "-1 ";
+    String bottlefull2 = " 0";
+    String bottlefull = " 1";
 
 
 
