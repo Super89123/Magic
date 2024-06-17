@@ -9,6 +9,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.damage.DamageEffect;
@@ -58,9 +59,8 @@ public final class Magic extends JavaPlugin implements Listener {
 
     public  Map<Location, Block> BarrierBlocks = new HashMap<>();
 
-
-
-
+    public Magic() throws IOException, InvalidConfigurationException {
+    }
 
 
     @Override
@@ -180,9 +180,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
 
-        configFile = new File(getDataFolder(), "puffers.yml");
-        config = YamlConfiguration.loadConfiguration(configFile);
-        loadInventories();
+
 
 
         plugin = this;
@@ -297,7 +295,6 @@ public final class Magic extends JavaPlugin implements Listener {
     }
     @Override
     public void onDisable(){
-        saveInventories();
     }
 
     @EventHandler
@@ -380,201 +377,13 @@ public final class Magic extends JavaPlugin implements Listener {
             }
         }.runTaskTimer(this, 0L, 10L); // Запускаем задачу с интервалом 10 тиков (0.5 секунды)
     }
-    private String locationToString(Location location) {
-        return location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
-    }
 
-    private Location locationFromString(String string) {
-        String[] parts = string.split(";");
-        if (parts.length == 4) {
-            return new Location(Bukkit.getWorld(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
-        }
-        return null;
-    }
-    public void loadInventories() {
-        for (String key : config.getKeys(false)) {
-            Location location = locationFromString(key);
-            if (location != null) {
-                ItemStack[] contents = ((List<ItemStack>) config.get(key)).toArray(new ItemStack[0]);
-                Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + location.getBlockZ() +" "+ location.getBlockY() +" "+ location.getBlockZ());
-                inventory.setContents(contents);
-                pufferManager.pufferInventories.put(location, inventory);
-            }
-        }
-    }
-    public void saveInventories() {
-        for (Map.Entry<Location, Inventory> entry : pufferManager.pufferInventories.entrySet()) {
-            Location location = entry.getKey();
-            Inventory inventory = entry.getValue();
-            config.set(locationToString(location), inventory.getContents());
-        }
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public  void removeInventoryFromFile(Location location) {
-        config.set(locationToString(location), null);
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    @EventHandler
-    public void onNoteBlockBreak(BlockBreakEvent event) {
-        Block block = event.getBlock();
-        if (block.getType() == Material.NOTE_BLOCK && pufferManager.pufferInventories.containsKey(block.getLocation())) {
-
-            Inventory inventory = pufferManager.pufferInventories.remove(block.getLocation());
-            removeInventoryFromFile(block.getLocation());
-
-            Location location = block.getLocation();
-            for (ItemStack item : inventory.getContents()) {
-                if ((item != null) && !item.getType().equals(Material.LIME_WOOL) && !item.getType().equals(Material.RED_WOOL) && !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
-                    location.getWorld().dropItemNaturally(location, item);
-                }
-            }
-        }
-    }
-    @EventHandler
-    public void onNoteBlockPlace(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        if (block.getType() == Material.NOTE_BLOCK) {
-            Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
-            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            inventory.setItem(22, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            for(int i = 0; i < 54; i++){
-
-                if(i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25){
-                    inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-
-                }
-            }
-
-            pufferManager.pufferInventories.put(block.getLocation(), inventory);
-        }
-    }
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-
-
-    public Inventory getPufferInventory(Block noteBlock) {
-        return pufferManager.pufferInventories.get(noteBlock.getLocation());
-    }
-    @EventHandler
-    public void onPlayerInteract1(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
-            Block noteBlock =  event.getClickedBlock();
-            Inventory inventory = getPufferInventory(noteBlock);
-            event.getPlayer().openInventory(inventory);
-
-
-
-
-            event.setCancelled(true);
-        }
-    }
-    @EventHandler
-    public void invclick(InventoryClickEvent event){
-        Player player = (Player) event.getWhoClicked();
-
-        Inventory inventory = event.getClickedInventory();
-        if (pufferManager.pufferInventories.containsValue(event.getClickedInventory())) {
-            Location location = getKeyByValue(pufferManager.pufferInventories, inventory);
-            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.LIME_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
-                event.setCancelled(true);
-
-
-
-
-
-            }
-            int slot = 10;
-            if(event.getCursor() != null){
-                if (event.getSlot() == slot && Objects.requireNonNull(event.getCursor()).getType().equals(Material.WATER_BUCKET)) {
-                    assert inventory != null;
-                    if (Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.RED_WOOL)) {
-                        inventory.setItem(10, new ItemStack(Material.BUCKET));
-                        inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
-                        event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
-                        return;
-                    }
-                    if (Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL)) {
-                        inventory.setItem(10, new ItemStack(Material.BUCKET));
-                        inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
-                        event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
-                        return;
-                    }
-                    if (Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL) && Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL)) {
-                        inventory.setItem(10, new ItemStack(Material.BUCKET));
-                        inventory.setItem(12, ItemUtils.create(Material.LIME_WOOL, " "));
-                        event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
-                        return;
-
-                    }
-
-                    pufferManager.pufferInventories.replace(location, inventory);
-
-                }
-
-                if(!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS) && !event.getCursor().getType().equals(Material.RED_WOOL)){
-                    if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37 || event.getSlot() == 25) {
-                        if(inventory.getItem(event.getSlot()).getType() != Material.LIGHT_GRAY_STAINED_GLASS_PANE) {
-                            player.getInventory().addItem(ItemUtils.create(event.getCurrentItem().getType(), ""));
-                            inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-                            event.setCursor(new ItemStack(Material.AIR));
-                            event.setCurrentItem(new ItemStack(Material.AIR));
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                    event.setCancelled(true);
-
-                }
-                if(event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37){
-
-                    if(event.getSlot() == 37 && Objects.requireNonNull(event.getCursor()).getType().equals(Material.PAPER) && event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasCustomModelData() && event.getCursor().getItemMeta().getCustomModelData() == 2029 && (inventory.getItem(30).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL) || Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.LIME_WOOL))){
-                        ItemStack itemStack = event.getCursor();
-                        event.setCursor(new ItemStack(Material.AIR));
-                        itemStack.setAmount(itemStack.getAmount()-1);
-                        inventoryWithCoolThings.setItem(Material.POTION, 2030, inventory, 25, "Очищеная вода");
-                        inventory.setItem(event.getSlot(), itemStack);
-                        event.setCancelled(true);
-
-
-
-                    }
-                }
-
-            }
-
-
-
-        }
-
-    }
     @EventHandler
     public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
             if (player.getHealth()-event.getDamage() > 2) {
-            return;
+                return;
             }
             if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
@@ -612,9 +421,9 @@ public final class Magic extends JavaPlugin implements Listener {
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-        if(playerDataController.getNowPlayerState(player) != -1 && !event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.MAGIC)) {
-            event.setCancelled(true);
-        }
+            if(playerDataController.getNowPlayerState(player) != -1 && !event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.MAGIC)) {
+                event.setCancelled(true);
+            }
         }
     }
     @EventHandler
@@ -642,15 +451,15 @@ public final class Magic extends JavaPlugin implements Listener {
         Player shooter = (Player) event.getEntity().getShooter();
         if(shooter.getInventory().getItemInMainHand().hasItemMeta() && shooter.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW) && shooter.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && shooter.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1449){
 
-        Entity nearbyEntity = arrow.getNearbyEntities(10, 10, 10).stream()
-                .filter(entity -> entity instanceof LivingEntity && entity != shooter) // Исключаем стрелка из поиска
-                .min(Comparator.comparingDouble(entity -> entity.getLocation().distance(arrow.getLocation())))
-                .orElse(null);
-        if (nearbyEntity != null) {
-            @NotNull Vector direction = nearbyEntity.getLocation().subtract(arrow.getLocation()).toVector().normalize();
-            arrow.setVelocity(direction.multiply(2));
-            arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.2, 0.2, 0.2, 0.1);
-        }
+            Entity nearbyEntity = arrow.getNearbyEntities(10, 10, 10).stream()
+                    .filter(entity -> entity instanceof LivingEntity && entity != shooter) // Исключаем стрелка из поиска
+                    .min(Comparator.comparingDouble(entity -> entity.getLocation().distance(arrow.getLocation())))
+                    .orElse(null);
+            if (nearbyEntity != null) {
+                @NotNull Vector direction = nearbyEntity.getLocation().subtract(arrow.getLocation()).toVector().normalize();
+                arrow.setVelocity(direction.multiply(2));
+                arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.2, 0.2, 0.2, 0.1);
+            }
         }
 
     }
@@ -688,6 +497,3 @@ public final class Magic extends JavaPlugin implements Listener {
         return plugin;
     }
 }
-
-
-
