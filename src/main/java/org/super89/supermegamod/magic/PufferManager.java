@@ -40,8 +40,8 @@ public class PufferManager implements Listener {
 
     public PufferManager() throws IOException, InvalidConfigurationException {
         configFile = new File(Magic.getPlugin().getDataFolder(), "puffers.yml");
-        YamlConfiguration yamlConfiguration = new YamlConfiguration();
-        yamlConfiguration.load(configFile);
+        config = new YamlConfiguration();
+        config.load(configFile);
     }
 
     @EventHandler
