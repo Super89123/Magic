@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -38,8 +38,8 @@ public class PufferManager implements Listener {
     private Map<Location, Integer> pufferCookTime = new HashMap<>(); // Время приготовления для каждого очистителя
     InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
 
-    public PufferManager() throws IOException, InvalidConfigurationException {
-        configFile = new File(Magic.getPlugin().getDataFolder(), "puffers.yml");
+    public PufferManager(Magic plugin) throws IOException, InvalidConfigurationException {
+        configFile = new File(plugin.getDataFolder(), "puffers.yml");
         config = new YamlConfiguration();
         config.load(configFile);
     }
@@ -71,8 +71,9 @@ public class PufferManager implements Listener {
             inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
             inventory.setItem(22, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+            inventory.setItem(53, ItemUtils.create(Material.GRAY_STAINED_GLASS_PANE, "§aУлучшения")); // Кнопка для меню улучшений
             for (int i = 0; i < 54; i++) {
-                if (i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25) {
+                if (i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25 && i != 53) {
                     inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
                 }
             }
@@ -110,12 +111,17 @@ public class PufferManager implements Listener {
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
                 event.getPlayer().openInventory(inventory);
-                event.setCancelled(true);
+                event.setCancelled(true); // Отменяем стандартное взаимодействие
             } else {
-                Inventory upgradeInventory = getUpgradeInventory(noteBlock);
-                if (upgradeInventory != null) {
-                    event.getPlayer().openInventory(upgradeInventory);
-                    event.setCancelled(true);
+                // Проверяем, не нажали ли на кнопку улучшений
+                if (event.getClickedBlock().getLocation().getBlockX() == noteBlock.getLocation().getBlockX() && event.getClickedBlock().getLocation().getBlockY() == noteBlock.getLocation().getBlockY() && event.getClickedBlock().getLocation().getBlockZ() == noteBlock.getLocation().getBlockZ()) {
+                    if (event.getHand() == EquipmentSlot.HAND && event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+                        Inventory upgradeInventory = getUpgradeInventory(noteBlock);
+                        if (upgradeInventory != null) {
+                            event.getPlayer().openInventory(upgradeInventory);
+                            event.setCancelled(true); // Отменяем стандартное взаимодействие
+                        }
+                    }
                 }
             }
         }
@@ -128,7 +134,7 @@ public class PufferManager implements Listener {
         Inventory inventory = event.getClickedInventory();
         if (pufferInventories.containsValue(event.getClickedInventory())) {
             Location location = getKeyByValue(pufferInventories, inventory);
-            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.LIME_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
+            if (Objects.requireNonNull(event.getCurrentItem()).getType().equals(Material.RED_WOOL) || event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.LIME_WOOL) || event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) || event.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) {
                 event.setCancelled(true);
                 return;
             }
@@ -136,7 +142,7 @@ public class PufferManager implements Listener {
             if (event.getCursor() != null) {
                 if (event.getSlot() == 10 && (Objects.requireNonNull(event.getCursor()).getType().equals(Material.GLASS_BOTTLE) || event.getCursor().getType().equals(Material.GLASS_BOTTLE))) {
                     if (Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.RED_WOOL)) {
-                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE)) {
+                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE) && !event.getCursor().getItemMeta().hasCustomModelData()) {
                             inventory.setItem(10, new ItemStack(Material.GLASS_BOTTLE)); // Используем Material
                         } else { // Кружка
                             inventory.setItem(10, ItemUtils.create(Material.GLASS_BOTTLE, " "));
@@ -144,12 +150,12 @@ public class PufferManager implements Listener {
                         }
                         inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
+                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                         startCooking(location, event.getCursor()); // Запускаем готовку
                         return;
                     }
                     if (Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL)) {
-                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE)) {
+                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE) && !event.getCursor().getItemMeta().hasCustomModelData()) {
                             inventory.setItem(10, new ItemStack(Material.GLASS_BOTTLE)); // Используем Material
                         } else { // Кружка
                             inventory.setItem(10, ItemUtils.create(Material.GLASS_BOTTLE, " "));
@@ -157,12 +163,12 @@ public class PufferManager implements Listener {
                         }
                         inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
+                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                         startCooking(location, event.getCursor()); // Запускаем готовку
                         return;
                     }
                     if (Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL) && Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL)) {
-                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE)) {
+                        if (event.getCursor().getType().equals(Material.GLASS_BOTTLE) && !event.getCursor().getItemMeta().hasCustomModelData()) {
                             inventory.setItem(10, new ItemStack(Material.GLASS_BOTTLE)); // Используем Material
                         } else { // Кружка
                             inventory.setItem(10, ItemUtils.create(Material.GLASS_BOTTLE, " "));
@@ -170,25 +176,25 @@ public class PufferManager implements Listener {
                         }
                         inventory.setItem(12, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
+                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                         startCooking(location, event.getCursor()); // Запускаем готовку
                         return;
                     }
                     pufferInventories.replace(location, inventory);
                 }
 
-                if (!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.RED_WOOL)) {
+                if (event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.RED_WOOL)) {
                     if (event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37 || event.getSlot() == 25) {
                         if (inventory.getItem(event.getSlot()).getType() != Material.LIGHT_GRAY_STAINED_GLASS_PANE) {
                             player.getInventory().addItem(event.getCurrentItem()); // Используем только Material
                             inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
                             event.setCursor(new ItemStack(Material.AIR));
                             event.setCurrentItem(new ItemStack(Material.AIR));
-                            event.setCancelled(true);
+                            // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                             return;
                         }
                     }
-                    event.setCancelled(true);
+                    // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                 }
 
                 if (event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37) {
@@ -232,8 +238,19 @@ public class PufferManager implements Listener {
     // Метод для запуска процесса приготовления
     private void startCooking(Location location, ItemStack item) {
         if (item.getType() == Material.GLASS_BOTTLE) {
-            pufferCookTime.put(location, 200); // 10 секунд
-        } else if (item.getType() == Material.GLASS_BOTTLE) {
+            if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
+                // Проверяем, если есть Custom Model Data
+                pufferCookTime.put(location, 200);
+            } else {
+                // Если нет Custom Model Data, создаем
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.setCustomModelData(2029); //  Пример Custom Model Data
+                    item.setItemMeta(meta);
+                }
+                pufferCookTime.put(location, 200);
+            }
+        } else if (item.getType() == Material.GLASS_BOTTLE) { // Кружка
             // Кружка может быть использована несколько раз
             int currentUses = 0;
             if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
@@ -369,7 +386,6 @@ public class PufferManager implements Listener {
         }
         return null;
     }
-
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {

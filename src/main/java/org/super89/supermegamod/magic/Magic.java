@@ -51,7 +51,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
     PlayerDataController playerDataController = new PlayerDataController(this);
     ReflectBook reflectBook = new ReflectBook();
-    PufferManager pufferManager = new PufferManager();
+    PufferManager pufferManager = new PufferManager(this);
     InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
     private static Magic plugin;
     private FileConfiguration config;
