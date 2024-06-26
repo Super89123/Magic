@@ -1,6 +1,7 @@
 package org.super89.supermegamod.magic;
 
 
+import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -11,20 +12,39 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
+
+
 
 import java.io.File;
 import java.io.IOException;
 
 public class PlayerDataController implements Listener {
+    String bottle3 = "\uE026";
+    String bottle2 = "\uE025";
+    String bottle = "\uE024";
+
+    @EventHandler
+    public void ITEM(ItemsAdderLoadDataEvent e){
+
+
+
+
+
+
+
+    }
+
+
+
     private Magic plugin;
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
-    String bottlefull3 = "-1 ";
-    String bottlefull2 = " 0";
-    String bottlefull = " 1";
+    String bottlefull3 = bottle3;
+    String bottlefull2 = bottle2;
+    String bottlefull = bottle;
 
 
 
@@ -240,7 +260,7 @@ public class PlayerDataController implements Listener {
             case 19:
                return bottlefull2+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
             default:
-                return bottlefull+bottlefull3+bottlefull3+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
+                return bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull+bottlefull;
         }
 
     }

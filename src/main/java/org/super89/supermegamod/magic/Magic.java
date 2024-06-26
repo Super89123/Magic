@@ -162,7 +162,7 @@ public final class Magic extends JavaPlugin implements Listener {
         amethyst_dust_meta.setCustomModelData(2029);
         amethyst_dust.setItemMeta(amethyst_dust_meta);
         amethyst_dust.setAmount(3);
-        StonecuttingRecipe recipe12345 = new StonecuttingRecipe(NamespacedKey.minecraft("amethyst_dust"), amethyst_dust, Material.AMETHYST_SHARD);
+        StonecuttingRecipe recipe12345 = new StonecuttingRecipe(NamespacedKey.minecraft("amethyst_dust1"), amethyst_dust, Material.AMETHYST_SHARD);
         Bukkit.addRecipe(recipe12345);
 
         ItemStack prismarine_dust = new ItemStack(Material.PAPER);
@@ -217,7 +217,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1005) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + " " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "   " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
 
 
 

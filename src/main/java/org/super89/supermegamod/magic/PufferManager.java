@@ -1,5 +1,6 @@
 package org.super89.supermegamod.magic;
 
+import com.sun.tools.javac.comp.Todo;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -68,12 +69,11 @@ public class PufferManager implements Listener {
             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            inventory.setItem(37, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-            inventory.setItem(22, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
+
+            inventory.setItem(23, ItemUtils.create(Material.GREEN_WOOL, "§aЗапуск"));
             inventory.setItem(53, ItemUtils.create(Material.GRAY_STAINED_GLASS_PANE, "§aУлучшения")); // Кнопка для меню улучшений
             for (int i = 0; i < 54; i++) {
-                if (i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25 && i != 53) {
+                if (i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25 && i != 53 && i != 23) {
                     inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
                 }
             }
@@ -147,7 +147,7 @@ public class PufferManager implements Listener {
 
                         inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
+                        event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                         startCooking(location, event.getCursor()); // Запускаем готовку
                         return;
                     }
@@ -157,7 +157,7 @@ public class PufferManager implements Listener {
 
                         inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
+                       event.setCancelled(true); // Убираем отмену, чтобы предмет клался
                         startCooking(location, event.getCursor()); // Запускаем готовку
                         return;
                     }
@@ -167,32 +167,32 @@ public class PufferManager implements Listener {
 
                         inventory.setItem(12, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
-                        // event.setCancelled(true); // Убираем отмену, чтобы предмет клался
-                        startCooking(location, event.getCursor()); // Запускаем готовку
+                        event.setCancelled(true); // Убираем отмену, чтобы предмет клался
+                        // Запускаем готовку
                         return;
                     }
                     pufferInventories.replace(location, inventory);
                 }
-
-                if (!event.getCurrentItem().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCurrentItem().getType().equals(Material.LIME_WOOL) && !event.getCurrentItem().getType().equals(Material.RED_WOOL) && !event.getCursor().getType().equals(Material.LIME_WOOL) && !event.getCursor().getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.RED_WOOL) && !event.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE) && !event.getCursor().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) {
-                    if (event.getSlot() == 22 || event.getSlot() == 10 || event.getSlot() == 37 || event.getSlot() == 25 || event.getSlot() == 53) {
-                        if (inventory.getItem(event.getSlot()).getType() != Material.LIGHT_GRAY_STAINED_GLASS_PANE) {
-                            player.getInventory().addItem(event.getCurrentItem()); // Используем только Material
-                            inventory.setItem(event.getSlot(), ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-                            event.setCursor(new ItemStack(Material.AIR));
-                            event.setCurrentItem(new ItemStack(Material.AIR));
-                             event.setCancelled(true); // Убираем отмену, чтобы предмет клался
-                            return;
-                        }
-                    }
-                    event.setCancelled(true); // Убираем отмену, чтобы предмет клался
+                if(event.getSlot() != 10 && event.getSlot() != 37 && event.getSlot() != 25 && event.getSlot() != 22){
+                    event.setCancelled(true);
+                    return;
+                }
+                if(event.getSlot() == 23){
+                    startCooking(location, event.getCurrentItem());
+                    player.sendMessage("Ку ку братик, я это еще делаю");
+                    event.setCancelled(true);
+                    return;
                 }
 
 
+                if(event.getSlot() == 53){
+                    player.openInventory(getUpgradeInventory(getKeyByValue(pufferInventories, inventory).getBlock()));
+                    event.setCancelled(true);
+                }
+
             }
-            if(event.getSlot() == 53){
-                player.openInventory(getUpgradeInventory(getKeyByValue(pufferInventories, inventory).getBlock()));
-            }
+
+
             pufferInventories.replace(location, inventory);
         } else if (pufferUpgradeInventories.containsValue(event.getClickedInventory())) {
             // Логика взаимодействия с меню улучшений
@@ -222,108 +222,7 @@ public class PufferManager implements Listener {
 
     // Метод для запуска процесса приготовления
     private void startCooking(Location location, ItemStack item) {
-        if (item.getType() == Material.GLASS_BOTTLE) {
-            if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
-                // Проверяем, если есть Custom Model Data
-                pufferCookTime.put(location, 200);
-            } else {
-                // Если нет Custom Model Data, создаем
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null) {
-                    meta.setCustomModelData(2029); //  Пример Custom Model Data
-                    item.setItemMeta(meta);
-                }
-                pufferCookTime.put(location, 200);
-            }
-        } else if (item.getType() == Material.GLASS_BOTTLE && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 2033) { // Кружка
-            // Кружка может быть использована несколько раз
-            int currentUses = 0;
-            if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
-                List<String> lore = item.getItemMeta().getLore();
-                if (!lore.isEmpty()) {
-                    try {
-                        currentUses = Integer.parseInt(lore.get(0).replace("§7Использований: ", ""));
-                    } catch (NumberFormatException ignored) {
-                    }
-                }
-            }
-            if (currentUses < 27) {
-                pufferCookTime.put(location, 200); // 10 секунд
-                currentUses++;
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null) {
-                    List<String> list = new java.util.ArrayList<>();
-                    list.add("§7Использований: " + currentUses);
-                    meta.setLore(list);
-                    item.setItemMeta(meta);
-                }
-            } else {
-                // Кружка пуста
-                return;
-            }
-        } else {
-            return;
-        }
-        // Запускаем задачу для проверки готовности
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (pufferCookTime.containsKey(location)) {
-                    int timeLeft = pufferCookTime.get(location) - 1;
-                    pufferCookTime.put(location, timeLeft);
-                    if (timeLeft <= 0) {
-                        // Готовка завершена
-                        pufferCookTime.remove(location);
-                        Inventory inventory = pufferInventories.get(location);
-                        if (inventory != null) {
-                            ItemStack water = new ItemStack(Material.POTION);
-                            ItemMeta watermeta = water.getItemMeta();
-                            watermeta.setCustomModelData(2030);
-                            watermeta.setDisplayName("&aОчищенная вода");
-                            water.setItemMeta(watermeta);
-                            // Проверяем наличие улучшений
-                            Inventory upgradeInventory = pufferUpgradeInventories.get(location);
-                            boolean isGear = upgradeInventory != null && upgradeInventory.getItem(3).getType() == Material.IRON_NUGGET;
-                            boolean isFunnel = upgradeInventory != null && upgradeInventory.getItem(4).getType() == Material.WATER_BUCKET;
-
-                            if (isFunnel) {
-                                // Автоматическое наполнение
-                                if (location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY() - 1, location.getBlockZ()).getType() == Material.WATER) {
-                                    // Проверяем, есть ли свободные красные шерсти
-                                    if (Objects.requireNonNull(inventory.getItem(30)).getType() == Material.RED_WOOL) {
-                                        inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
-                                    } else if (Objects.requireNonNull(inventory.getItem(21)).getType() == Material.RED_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.LIME_WOOL) {
-                                        inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
-                                    } else if (Objects.requireNonNull(inventory.getItem(12)).getType() == Material.RED_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.LIME_WOOL && Objects.requireNonNull(inventory.getItem(21)).getType() == Material.LIME_WOOL) {
-                                        inventory.setItem(12, ItemUtils.create(Material.LIME_WOOL, " "));
-                                    }
-                                }
-                            }
-                            if (isGear) {
-                                // Ускорение
-                                if (Objects.requireNonNull(inventory.getItem(30)).getType() == Material.LIME_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                } else if (Objects.requireNonNull(inventory.getItem(21)).getType() == Material.LIME_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.RED_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                } else if (Objects.requireNonNull(inventory.getItem(12)).getType() == Material.LIME_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.RED_WOOL && Objects.requireNonNull(inventory.getItem(21)).getType() == Material.RED_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                }
-                            } else {
-                                // Стандартная скорость
-                                if (Objects.requireNonNull(inventory.getItem(30)).getType() == Material.LIME_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                } else if (Objects.requireNonNull(inventory.getItem(21)).getType() == Material.LIME_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.RED_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                } else if (Objects.requireNonNull(inventory.getItem(12)).getType() == Material.LIME_WOOL && Objects.requireNonNull(inventory.getItem(30)).getType() == Material.RED_WOOL && Objects.requireNonNull(inventory.getItem(21)).getType() == Material.RED_WOOL) {
-                                    inventory.setItem(25, water); // Используем Material
-                                }
-                            }
-                            pufferInventories.replace(location, inventory);
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(Magic.getPlugin(), 0L, 2L); // 1 тик = 0.05 секунды, 20 тиков = 1 секунда
+       ; // TODO
     }
 
     public  void loadInventories() {
