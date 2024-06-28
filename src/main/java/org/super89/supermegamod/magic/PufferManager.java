@@ -1,7 +1,8 @@
 package org.super89.supermegamod.magic;
 
-import com.sun.tools.javac.comp.Todo;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,7 +21,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
+
 import org.super89.supermegamod.magic.Utils.ItemUtils;
 
 import java.io.File;
@@ -34,10 +35,11 @@ public class PufferManager implements Listener {
 
     public final Map<Location, Inventory> pufferInventories = new HashMap<>();
     public final Map<Location, Inventory> pufferUpgradeInventories = new HashMap<>();
-    private FileConfiguration config;
-    private File configFile;
-    private Map<Location, Integer> pufferCookTime = new HashMap<>(); // Время приготовления для каждого очистителя
+    private final FileConfiguration config;
+    private final File configFile;
+    private final Map<Location, Integer> pufferCookTime = new HashMap<>(); // Время приготовления для каждого очистителя
     InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
+    WaitAsync waitAsync = new WaitAsync(Bukkit.getScheduler());
 
     public PufferManager(Magic plugin) throws IOException, InvalidConfigurationException {
         configFile = new File(plugin.getDataFolder(), "puffers.yml");
@@ -69,6 +71,7 @@ public class PufferManager implements Listener {
             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+            inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
 
             inventory.setItem(23, ItemUtils.create(Material.GREEN_WOOL, "§aЗапуск"));
             inventory.setItem(53, ItemUtils.create(Material.GRAY_STAINED_GLASS_PANE, "§aУлучшения")); // Кнопка для меню улучшений
@@ -106,7 +109,7 @@ public class PufferManager implements Listener {
     // Обработчик взаимодействия с очистителем
     @EventHandler
     public void onPlayerInteract1(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.NOTE_BLOCK) {
             Block noteBlock = event.getClickedBlock();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
@@ -139,16 +142,16 @@ public class PufferManager implements Listener {
                 return;
             }
             // Логика взаимодействия с очистителем
-            if (event.getCursor() != null) {
+            if (!event.getCursor().getType().equals(Material.AIR)) {
                 if (event.getSlot() == 10 && (Objects.requireNonNull(event.getCursor()).getType().equals(Material.WATER_BUCKET))) {
-                    if (Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.RED_WOOL)) {
+                    if (Objects.requireNonNull(Objects.requireNonNull(inventory).getItem(30)).getType().equals(Material.RED_WOOL)) {
 
                         inventory.setItem(10, new ItemStack(Material.BUCKET)); // Используем Material
 
                         inventory.setItem(30, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
                         event.setCancelled(true); // Убираем отмену, чтобы предмет клался
-                        startCooking(location, event.getCursor()); // Запускаем готовку
+                        // Запускаем готовку
                         return;
                     }
                     if (Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL)) {
@@ -158,7 +161,7 @@ public class PufferManager implements Listener {
                         inventory.setItem(21, ItemUtils.create(Material.LIME_WOOL, " "));
                         event.setCursor(new ItemStack(Material.AIR));
                        event.setCancelled(true); // Убираем отмену, чтобы предмет клался
-                        startCooking(location, event.getCursor()); // Запускаем готовку
+                         // Запускаем готовку
                         return;
                     }
                     if (Objects.requireNonNull(inventory.getItem(12)).getType().equals(Material.RED_WOOL) && Objects.requireNonNull(inventory.getItem(30)).getType().equals(Material.LIME_WOOL) && Objects.requireNonNull(inventory.getItem(21)).getType().equals(Material.LIME_WOOL)) {
@@ -173,12 +176,20 @@ public class PufferManager implements Listener {
                     }
                     pufferInventories.replace(location, inventory);
                 }
-                if(event.getSlot() != 10 && event.getSlot() != 37 && event.getSlot() != 25 && event.getSlot() != 22){
+                if(event.getSlot() == 10 && (event.getCursor().getType().equals(Material.BUCKET) || event.getCurrentItem().getType().equals(Material.BUCKET))){
+                    player.getInventory().addItem(new ItemStack(Material.BUCKET));
+                    event.setCursor(new ItemStack(Material.AIR));
+                    event.setCurrentItem(new ItemStack(Material.AIR));
+                    assert inventory != null;
+                    inventory.setItem(10, new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE));
+                    event.setCancelled(true);
+                }
+                if(event.getSlot() != 10 && event.getSlot() != 37 && event.getSlot() != 25 && event.getSlot() != 22 && event.getSlot() != 23 &&  event.getSlot() != 53){
                     event.setCancelled(true);
                     return;
                 }
                 if(event.getSlot() == 23){
-                    startCooking(location, event.getCurrentItem());
+                    startCooking(inventory, player);
                     player.sendMessage("Ку ку братик, я это еще делаю");
                     event.setCancelled(true);
                     return;
@@ -186,7 +197,7 @@ public class PufferManager implements Listener {
 
 
                 if(event.getSlot() == 53){
-                    player.openInventory(getUpgradeInventory(getKeyByValue(pufferInventories, inventory).getBlock()));
+                    player.openInventory(getUpgradeInventory(Objects.requireNonNull(getKeyByValue(pufferInventories, inventory)).getBlock()));
                     event.setCancelled(true);
                 }
 
@@ -221,7 +232,280 @@ public class PufferManager implements Listener {
     }
 
     // Метод для запуска процесса приготовления
-    private void startCooking(Location location, ItemStack item) {
+    private void startCooking(Inventory inventory, Player player) {
+        ItemStack result1 = new ItemStack(Material.POTION);
+        ItemMeta result1ItemMeta = result1.getItemMeta();
+        result1ItemMeta.setCustomModelData(2030);
+        result1ItemMeta.setDisplayName(ChatColor.WHITE + "Очищенная вода");
+        result1.setItemMeta(result1ItemMeta);
+
+        ItemStack result2 = new ItemStack(Material.POTION);
+        ItemMeta result2ItemMeta = result1.getItemMeta();
+        result2ItemMeta.setCustomModelData(2031);
+        result2ItemMeta.setDisplayName(ChatColor.WHITE + "Очищенная вода+");
+        result2.setItemMeta(result2ItemMeta);
+
+        ItemStack result3 = new ItemStack(Material.POTION);
+        ItemMeta result3ItemMeta = result1.getItemMeta();
+        result3ItemMeta.setCustomModelData(2034);
+        result3ItemMeta.setDisplayName(ChatColor.WHITE + "Кружка с водой");
+        result3.setItemMeta(result2ItemMeta);
+
+        ItemStack result4 = new ItemStack(Material.POTION);
+        ItemMeta result4ItemMeta = result1.getItemMeta();
+        result4ItemMeta.setCustomModelData(2035);
+        result4ItemMeta.setDisplayName(ChatColor.WHITE + "Кружка с водой+");
+        result4.setItemMeta(result2ItemMeta);
+
+        ItemStack cup = new ItemStack(Material.GLASS_BOTTLE);
+        ItemMeta cupmeta = cup.getItemMeta();
+        cupmeta.setCustomModelData(2033);
+        cupmeta.setDisplayName(ChatColor.WHITE + "Кружка");
+        cup.setItemMeta(cupmeta);
+
+        if(inventory.getItem(12).getType().equals(Material.LIME_WOOL) || inventory.getItem(21).getType().equals(Material.LIME_WOOL) ||  inventory.getItem(30).getType().equals(Material.LIME_WOOL)){
+            if(inventory.getItem(12).getType().equals(Material.LIME_WOOL)){
+                if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result1);
+                        } 
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result2);
+                            
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    } 
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+                        
+                    }
+                    
+                }
+                else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result3);
+                        }
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result4);
+
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+
+                    }
+
+
+                }
+                else {
+                    player.sendMessage(ChatColor.RED + "Неправильная ёмкость для воды");
+                }
+
+            }
+            else if (inventory.getItem(12).getType().equals(Material.RED_WOOL) && inventory.getItem(21).getType().equals(Material.LIME_WOOL)) {
+                if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result1);
+                        }
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result2);
+
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+
+                    }
+
+                }
+                else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result3);
+                        }
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result4);
+
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+
+                    }
+
+
+                }
+                else {
+                    player.sendMessage(ChatColor.RED + "Неправильная ёмкость для воды");
+                }
+
+
+            }
+            else if (inventory.getItem(12).getType().equals(Material.RED_WOOL) && inventory.getItem(21).getType().equals(Material.RED_WOOL) && inventory.getItem(30).getType().equals(Material.LIME_WOOL)) {
+                if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result1);
+                        }
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+                            inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result2);
+
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+
+                    }
+
+                }
+                else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
+                    if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+
+                            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result3);
+                        }
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
+                            ItemStack newCup = new ItemStack(cup);
+                            newCup.setAmount(inventory.getItem(22).getAmount()-1);
+                            inventory.setItem(22, newCup);
+                            ItemStack newDust = inventory.getItem(37);
+                            newDust.setAmount(newDust.getAmount()-1);
+                            inventory.setItem(37, newDust);
+                            waitAsync.waitAsync(1);
+                            inventory.setItem(25, result4);
+
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"Неправильный ингридиент!");
+
+                        }
+                    }
+                    else {
+                        player.sendMessage(ChatColor.RED + "Неправильный ингридиент!");
+
+                    }
+
+
+                }
+                else {
+                    player.sendMessage(ChatColor.RED + "Неправильная ёмкость для воды");
+                }
+
+
+
+            }
+            else {
+                player.sendMessage(ChatColor.RED + "Нет Воды");
+            }
+
+        }
+        else {
+            player.sendMessage(ChatColor.RED + "Нет Воды");
+        }
        ; // TODO
     }
 
@@ -279,3 +563,6 @@ public class PufferManager implements Listener {
         return null;
     }
 }
+
+
+

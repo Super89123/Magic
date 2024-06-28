@@ -37,7 +37,6 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.BOOK, 1010101, inventory, 3, "Книга Вызывателя");
             setItem(Material.BOOK, 1231, inventory, 4, "Книга шахтера");
             setItem(Material.BOOK, 1001, inventory, 5, "Книга Взрыва");
-            setItem(Material.IRON_SWORD, 1488, inventory, 6, "Ненасытный меч");
             setItem(Material.BOOK, 1005, inventory, 7, "Книга двужизия");
             setItem(Material.BOOK, 1006, inventory, 8, "Книга шипов");
             setItem(Material.BOOK, 1007, inventory, 9, "Книга возвращения");
@@ -54,6 +53,9 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.POTION, 2030, inventory, 20, "Очищенная вода");
             setItem(Material.POTION, 2031, inventory, 21, "Очищенная вода+");
             setItem(Material.PAPER, 2032, inventory, 22, "Призмариновый порошок");
+            setItem(Material.GLASS_BOTTLE, 2033, inventory, 6, "Пустая кружка");
+            setItem(Material.POTION, 2034, inventory, 23, "Кружка с водой");
+            setItem(Material.POTION, 2035, inventory, 24, "Кружка с водой+");
 
 
             player.openInventory(inventory);

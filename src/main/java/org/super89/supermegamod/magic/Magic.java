@@ -291,7 +291,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(this, 0, 20 * 60);
+        }.runTaskTimer(this, 0, 40 * 60);
     }
     @Override
     public void onDisable(){
