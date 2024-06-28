@@ -2,6 +2,7 @@ org\super89\supermegamod\magic\TeleportBook.class
 org\super89\supermegamod\magic\PufferManager.class
 org\super89\supermegamod\magic\Magic$3.class
 org\super89\supermegamod\magic\CustomPotion.class
+org\super89\supermegamod\magic\WaitAsync.class
 org\super89\supermegamod\magic\WindBook.class
 org\super89\supermegamod\magic\SonicBook.class
 org\super89\supermegamod\magic\Magic$2.class

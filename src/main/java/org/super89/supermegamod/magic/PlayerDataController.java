@@ -215,6 +215,7 @@ public class PlayerDataController implements Listener {
                 setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 3, 20));
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 100 * 20, 10, false,false,false));
             }
+
         }
     }
     public String calculatePlayerThirst(Player player){
