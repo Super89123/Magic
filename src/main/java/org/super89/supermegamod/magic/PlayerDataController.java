@@ -1,7 +1,7 @@
 package org.super89.supermegamod.magic;
 
 
-import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -15,7 +15,8 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
+
+
 
 
 
@@ -27,16 +28,7 @@ public class PlayerDataController implements Listener {
     String bottle2 = "\uE025";
     String bottle = "\uE024";
 
-    @EventHandler
-    public void ITEM(ItemsAdderLoadDataEvent e){
 
-
-
-
-
-
-
-    }
 
 
 

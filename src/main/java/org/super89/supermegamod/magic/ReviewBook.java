@@ -15,7 +15,7 @@ public class ReviewBook implements Listener {
         Player player = event.getPlayer();
         Location spawnpoint = player.getBedSpawnLocation();
         Location worldSpawn = player.getWorld().getSpawnLocation();
-        if (event.getItem() != null && event.getAction().isRightClick() && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 1007 && playerDataController.getNowPlayerMana(player) == 100) {
+        if (event.getItem() != null && event.getAction().isRightClick() && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10004 && playerDataController.getNowPlayerMana(player) == 100) {
             if(spawnpoint != null) {
                 player.teleport(spawnpoint);
             }

@@ -31,30 +31,30 @@ public class InventoryWithCoolThings implements Listener {
 
         if(player.hasPermission("minecraft.*")) {
             Inventory inventory = Bukkit.createInventory(null, 54, "Debug Table");
-            setItem(Material.BOOK, 1000, inventory, 0, "Книга Стана");
-            setItem(Material.BOOK, 1002, inventory, 1, "Книга телепорта");
-            setItem(Material.BOOK, 1230, inventory, 2, "Книга левитации");
-            setItem(Material.BOOK, 1010101, inventory, 3, "Книга Вызывателя");
-            setItem(Material.BOOK, 1231, inventory, 4, "Книга шахтера");
-            setItem(Material.BOOK, 1001, inventory, 5, "Книга Взрыва");
-            setItem(Material.BOOK, 1005, inventory, 7, "Книга двужизия");
+            setItem(Material.BOOK, 10005, inventory, 0, "Книга Стана");
+            setItem(Material.BOOK, 10000, inventory, 1, "Книга телепорта");
+            setItem(Material.BOOK, 10007, inventory, 2, "Книга левитации");
+            setItem(Material.BOOK, 10006, inventory, 3, "Книга Вызывателя");
+            setItem(Material.BOOK, 10002, inventory, 4, "Книга шахтера");
+            setItem(Material.BOOK, 10009, inventory, 5, "Книга Взрыва");
+            setItem(Material.BOOK, 10003, inventory, 7, "Книга двужизия");
             setItem(Material.BOOK, 1006, inventory, 8, "Книга шипов");
-            setItem(Material.BOOK, 1007, inventory, 9, "Книга возвращения");
+            setItem(Material.BOOK, 10004, inventory, 9, "Книга возвращения");
             setItem(Material.BOOK, 1010, inventory, 10, "Книга Защиты");
-            setItem(Material.BOOK, 1011, inventory, 11, "Книга Огня");
-            setItem(Material.BOOK, 1012, inventory, 12, "Книга Ветра");
+            setItem(Material.BOOK, 10008, inventory, 11, "Книга Огня");
+            setItem(Material.BOOK, 10001, inventory, 12, "Книга Ветра");
             setItem(Material.CROSSBOW, 1449, inventory, 13, "Автоматон");
             setItem(Material.SHIELD, 1020, inventory, 14, "Незеритовый щит");
             setItem(Material.SHIELD, 1021, inventory, 15, "Железный щит");
             setItem(Material.POTION, 2026, inventory, 16, "§bЗелье Маны");
-            setItem(Material.RABBIT_FOOT, 2025, inventory, 17, "Лазуритовая пыль");
-            setItem(Material.PAPER, 4000, inventory, 18, "Звездная пыль");
-            setItem(Material.PAPER, 2029, inventory, 19, "Аметистовая пыль");
+            setItem(Material.RABBIT_FOOT, 10000, inventory, 17, "Лазуритовая пыль");
+            setItem(Material.PAPER, 10261, inventory, 18, "Звездная пыль");
+            setItem(Material.PAPER, 10260, inventory, 19, "Аметистовая пыль");
             setItem(Material.POTION, 2030, inventory, 20, "Очищенная вода");
             setItem(Material.POTION, 2031, inventory, 21, "Очищенная вода+");
-            setItem(Material.PAPER, 2032, inventory, 22, "Призмариновый порошок");
-            setItem(Material.GLASS_BOTTLE, 2033, inventory, 6, "Пустая кружка");
-            setItem(Material.POTION, 2034, inventory, 23, "Кружка с водой");
+            setItem(Material.PAPER, 10263, inventory, 22, "Призмариновый порошок");
+            setItem(Material.GLASS_BOTTLE, 10000, inventory, 6, "Пустая кружка");
+            setItem(Material.POTION, 10000, inventory, 23, "Кружка с водой");
             setItem(Material.POTION, 2035, inventory, 24, "Кружка с водой+");
 
 

@@ -18,7 +18,7 @@ public class WindBook implements Listener {
         if(event.getDamager() instanceof Player){
             Player player = (Player) event.getDamager();
             ItemStack item = player.getInventory().getItemInMainHand();
-            if (item.getType() == Material.BOOK && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1012){
+            if (item.getType() == Material.BOOK && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10001){
                 Entity entity = event.getEntity();
                 Location playerLocation = player.getLocation();
                 Location entityLocation = entity.getLocation();

@@ -30,7 +30,7 @@ public class FireBook implements Listener {
     public void onplayer(PlayerInteractEvent e){
         Player player = e.getPlayer();
         ItemStack itemStack = e.getItem();
-        if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 1011){
+        if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 10008){
             spawnFireParticlesAroundPlayer(player);
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof LivingEntity) {

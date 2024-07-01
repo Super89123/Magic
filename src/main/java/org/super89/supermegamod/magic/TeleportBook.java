@@ -28,7 +28,7 @@ public class TeleportBook implements Listener {
         if (item != null && item.getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1002) {
 
 
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1002 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10000 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
 
                 playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-20);
                 Location location = player.getLocation();

@@ -18,7 +18,7 @@ public class EvokerFangsBook implements Listener {
 
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 1010101 && event.getItem().getItemMeta().hasCustomModelData()) {
+            if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10006 && event.getItem().getItemMeta().hasCustomModelData()) {
                 Player player = event.getPlayer();
 
                 double yaw = player.getLocation().getYaw();

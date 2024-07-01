@@ -16,7 +16,7 @@ public class CustomPotion implements Listener {
     @EventHandler
     public void brewevent(BrewEvent event1){
         ItemStack item = event1.getContents().getIngredient();
-        if(item != null && item.getType() == Material.RABBIT_FOOT && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 2025){
+        if(item != null && item.getType() == Material.RABBIT_FOOT && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10000){
             BrewerInventory inventory = event1.getContents();
             ItemStack potion = new ItemStack(Material.POTION);
             ItemMeta meta = potion.getItemMeta();

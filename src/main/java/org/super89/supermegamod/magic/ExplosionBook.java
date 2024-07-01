@@ -28,7 +28,7 @@ public class ExplosionBook implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (event.getAction().name().contains("RIGHT_CLICK") && item.getType() == Material.BOOK) {
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1001 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10009 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
                 playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-25);
 
 
