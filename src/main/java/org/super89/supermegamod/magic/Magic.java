@@ -2,16 +2,7 @@ package org.super89.supermegamod.magic;
 
 
 
-import dev.geco.gsit.events.BlockEvents;
-import dev.geco.gsit.events.InteractEvents;
-import dev.geco.gsit.events.PlayerEvents;
-import dev.geco.gsit.events.PlayerSitEvents;
-import dev.geco.gsit.manager.*;
-import dev.geco.gsit.objects.GetUpReason;
-import dev.geco.gsit.util.EnvironmentUtil;
-import dev.geco.gsit.util.IEntityUtil;
-import dev.geco.gsit.util.IPackageUtil;
-import dev.geco.gsit.util.PassengerUtil;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -46,7 +37,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import dev.geco.gsit.api.GSitAPI;
+
 
 
 
@@ -60,59 +51,7 @@ import java.util.*;
 
 public final class Magic extends JavaPlugin implements Listener {
     public final String NAME = "Quantov";
-    private SVManager svManager;
 
-    public Magic() throws IOException, InvalidConfigurationException {
-    }
-
-    public SVManager getSVManager() { return svManager; }
-
-    private CManager cManager;
-    public CManager getCManager() { return cManager; }
-
-    private DManager dManager;
-    public DManager getDManager() { return dManager; }
-
-    private SitManager sitManager;
-    public SitManager getSitManager() { return sitManager; }
-
-    private PlayerSitManager playerSitManager;
-    public PlayerSitManager getPlayerSitManager() { return playerSitManager; }
-
-    private PoseManager poseManager;
-    public PoseManager getPoseManager() { return poseManager; }
-
-
-    public CrawlManager getCrawlManager() { return crawlManager; }
-
-    private ToggleManager toggleManager;
-    public ToggleManager getToggleManager() { return toggleManager; }
-
-    private UManager uManager;
-    public UManager getUManager() { return uManager; }
-
-    private PManager pManager;
-    public PManager getPManager() { return pManager; }
-
-    private TManager tManager;
-    public TManager getTManager() { return tManager; }
-
-    private MManager mManager;
-    public MManager getMManager() { return mManager; }
-
-    private PassengerUtil passengerUtil;
-    public PassengerUtil getPassengerUtil() { return passengerUtil; }
-
-    private EnvironmentUtil environmentUtil;
-    public EnvironmentUtil getEnvironmentUtil() { return environmentUtil; }
-
-    private IEntityUtil entityUtil;
-    public IEntityUtil getEntityUtil() { return entityUtil; }
-
-    private IPackageUtil packageUtil;
-    public IPackageUtil getPackageUtil() { return packageUtil; }
-
-    CrawlManager crawlManager = new CrawlManager(this);
 
 
 
@@ -128,7 +67,8 @@ public final class Magic extends JavaPlugin implements Listener {
 
     public  Map<Location, Block> BarrierBlocks = new HashMap<>();
 
-
+    public Magic() throws IOException, InvalidConfigurationException {
+    }
 
 
     @Override
@@ -166,10 +106,6 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new WindBook(), this);
         Bukkit.getPluginManager().registerEvents(new FireBook(), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockEvents(this), this);
-        Bukkit.getPluginManager().registerEvents(new InteractEvents(this), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerSitEvents(this), this);
 
 
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
@@ -307,13 +243,13 @@ public final class Magic extends JavaPlugin implements Listener {
 
                         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, false, false));
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, false, false));
-                        getCrawlManager().startCrawl(player);
+
 
 
 
                     }
                     if(a == -1){
-                        getCrawlManager().stopCrawl(player, GetUpReason.PLUGIN);
+
                     }
 
 
@@ -429,7 +365,7 @@ public final class Magic extends JavaPlugin implements Listener {
             }
             if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
-                getCrawlManager().startCrawl(player);
+
                 new BukkitRunnable() {
                     int ticks = 0;
 
@@ -441,7 +377,7 @@ public final class Magic extends JavaPlugin implements Listener {
                         if (ticks >= 60){
                             if(playerDataController.getNowPlayerState(player) != -1) {
                                 player.damage(1024);
-                                getCrawlManager().stopCrawl(player, GetUpReason.PLUGIN);
+
 
                             }
                             cancel();
@@ -556,7 +492,7 @@ public final class Magic extends JavaPlugin implements Listener {
     @EventHandler
     public void onNoteBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        if (block.getType() == Material.NOTE_BLOCK) {
+        if (block.getType() == Material.NOTE_BLOCK && block instanceof  NoteBlock) {
             NoteBlock noteBlock = (NoteBlock) block;
             if(noteBlock.getInstrument().equals(Instrument.GUITAR) && noteBlock.getNote().getOctave() == 22){
             Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
@@ -603,7 +539,11 @@ public final class Magic extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerInteract1(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.NOTE_BLOCK) {
-            Block noteBlock = event.getClickedBlock();
+            if (event.getClickedBlock() instanceof NoteBlock){
+
+            NoteBlock noteBlock1 = (NoteBlock) event.getClickedBlock();
+            if(noteBlock1.getNote().getOctave() == 22 && noteBlock1.getInstrument().equals(Instrument.GUITAR)){
+                Block noteBlock = event.getClickedBlock();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
                 event.getPlayer().openInventory(inventory);
@@ -620,6 +560,8 @@ public final class Magic extends JavaPlugin implements Listener {
                     }
                 }
             }
+        }
+    }
         }
     }
 
