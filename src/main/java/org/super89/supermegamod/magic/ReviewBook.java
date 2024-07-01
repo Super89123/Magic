@@ -1,6 +1,7 @@
 package org.super89.supermegamod.magic;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ public class ReviewBook implements Listener {
             }
             playerDataController.setNowPlayerMana(player, 0);
             player.playSound((Entity) player, Sound.BLOCK_PORTAL_TRAVEL, 100, 100);
+            event.getItem().setType(Material.AIR);
         }
     }
 }

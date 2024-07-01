@@ -4,6 +4,8 @@ package org.super89.supermegamod.magic;
 
 
 import dev.lone.itemsadder.api.CustomBlock;
+import dev.lone.itemsadder.api.Events.CustomBlockInteractEvent;
+import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -119,6 +121,7 @@ public final class Magic extends JavaPlugin implements Listener {
         PersistentDataContainer container = paperMeta.getPersistentDataContainer();
         container.set(new NamespacedKey("your-plugin-namespace", "custom-model-data"), PersistentDataType.INTEGER, 10261);
         paperMeta.setCustomModelData(10261);
+        paperMeta.setDisplayName("Звезднаяя пыль");
         paper.setAmount(5);
         paper.setItemMeta(paperMeta);
 
@@ -133,6 +136,7 @@ public final class Magic extends JavaPlugin implements Listener {
         PersistentDataContainer container1 = rabrMeta.getPersistentDataContainer();
         container1.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 10000);
         rabrMeta.setCustomModelData(10000);
+        rabrMeta.setDisplayName("Лазуритовый порошок");
         rabbit_foot.setItemMeta(rabrMeta);
         rabbit_foot.setAmount(5);
 
@@ -147,6 +151,7 @@ public final class Magic extends JavaPlugin implements Listener {
         PersistentDataContainer container2 = amethyst_dust_meta.getPersistentDataContainer();
         container2.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 10260);
         amethyst_dust_meta.setCustomModelData(10260);
+        amethyst_dust_meta.setDisplayName("Аметистовый порошок");
         amethyst_dust.setItemMeta(amethyst_dust_meta);
         amethyst_dust.setAmount(3);
         StonecuttingRecipe recipe12345 = new StonecuttingRecipe(NamespacedKey.minecraft("amethyst_dust1"), amethyst_dust, Material.AMETHYST_SHARD);
@@ -158,6 +163,7 @@ public final class Magic extends JavaPlugin implements Listener {
         PersistentDataContainer container3 = prismarine_dust_meta.getPersistentDataContainer();
         container3.set(new NamespacedKey(this, "custom-model-data"), PersistentDataType.INTEGER, 10263);
         prismarine_dust_meta.setCustomModelData(10263);
+        prismarine_dust_meta.setDisplayName("Призмариновый порошок");
         prismarine_dust.setItemMeta(prismarine_dust_meta);
         prismarine_dust.setAmount(5);
         StonecuttingRecipe recipe123456 = new StonecuttingRecipe(NamespacedKey.minecraft("prismarine_dust"), prismarine_dust, Material.PRISMARINE_SHARD);
@@ -368,6 +374,13 @@ public final class Magic extends JavaPlugin implements Listener {
             }
             if (player.getHealth()-event.getDamage() <= 2 && playerDataController.getNowPlayerState(player) == -1){
                 playerDataController.setNowPlayerPkm(player, 9);
+                Location location = player.getLocation();
+                location.setY(location.getY()+1);
+                Block block = location.getBlock();
+                if(block.getType().equals(Material.AIR)){
+                    block.setType(Material.BARRIER);
+                    BarrierBlocks.put(location, block);
+                }
 
                 new BukkitRunnable() {
                     int ticks = 0;
@@ -485,7 +498,7 @@ public final class Magic extends JavaPlugin implements Listener {
             pufferManager.pufferUpgradeInventories.remove(block.getLocation());
             Location location = block.getLocation();
             for (ItemStack item : inventory.getContents()) {
-                if ((item != null) && !item.getType().equals(Material.LIME_WOOL) && !item.getType().equals(Material.RED_WOOL) && !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE)) {
+                if ((item != null) && !item.getType().equals(Material.LIME_WOOL) && !item.getType().equals(Material.RED_WOOL) && !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !item.getType().equals(Material.GRAY_STAINED_GLASS_PANE) && !item.getType().equals(Material.GREEN_WOOL)) {
                     location.getWorld().dropItemNaturally(location, item);
                 }
             }
@@ -493,10 +506,12 @@ public final class Magic extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onNoteBlockPlace(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        if (block.getType() == Material.NOTE_BLOCK) {
-            if(CustomBlock.byAlreadyPlaced(block).getNamespacedID().equals("puffer")){
+    public void onNoteBlockPlace(CustomBlockPlaceEvent event) {
+        Block block = event.getBlock();
+
+
+            if(event.getCustomBlockItem().getItemMeta().getCustomModelData() == 10260){
+
 
 
             Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
@@ -516,7 +531,7 @@ public final class Magic extends JavaPlugin implements Listener {
             createUpgradeInventory(block.getLocation()); // Создаем меню улучшений
         }
         }
-    }
+
 
 
     // Метод для создания меню улучшений
@@ -542,18 +557,18 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
     @EventHandler
-    public void onPlayerInteract1(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.NOTE_BLOCK) {
-            if(CustomBlock.byAlreadyPlaced(event.getClickedBlock()).getNamespacedID().equals("puffer")){
-            Block noteBlock = event.getClickedBlock();
+    public void onPlayerInteract1(CustomBlockInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if(CustomBlock.byAlreadyPlaced(event.getBlockClicked()).getId().equals("puffer")){
+            Block noteBlock = event.getBlockClicked();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
                 event.getPlayer().openInventory(inventory);
                 event.setCancelled(true);
             } else {
 
-                if (event.getClickedBlock().getLocation().getBlockX() == noteBlock.getLocation().getBlockX() && event.getClickedBlock().getLocation().getBlockY() == noteBlock.getLocation().getBlockY() && event.getClickedBlock().getLocation().getBlockZ() == noteBlock.getLocation().getBlockZ()) {
-                    if (event.getHand() == EquipmentSlot.HAND && event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+                if (event.getBlockClicked().getLocation().getBlockX() == noteBlock.getLocation().getBlockX() && event.getBlockClicked().getLocation().getBlockY() == noteBlock.getLocation().getBlockY() && event.getBlockClicked().getLocation().getBlockZ() == noteBlock.getLocation().getBlockZ()) {
+                    if (event.getHand() == EquipmentSlot.HAND && event.getBlockClicked() != null && event.getBlockClicked().getType() == Material.NOTE_BLOCK) {
                         Inventory upgradeInventory = getUpgradeInventory(noteBlock);
                         if (upgradeInventory != null) {
                             event.getPlayer().openInventory(upgradeInventory);
@@ -1037,7 +1052,7 @@ public final class Magic extends JavaPlugin implements Listener {
     @EventHandler
     public void movementEvent(PlayerMoveEvent event){
        if(playerDataController.getNowPlayerState(event.getPlayer()) != -1){
-        if(event.hasChangedBlock()){
+
             Player player = event.getPlayer();
             Location location = player.getLocation();
             location.setY(location.getY() + 1);
@@ -1045,7 +1060,7 @@ public final class Magic extends JavaPlugin implements Listener {
             if(block.getType().equals(Material.AIR)){
                 block.setType(Material.BARRIER);
                 BarrierBlocks.put(location, block);
-            }
+
 
 
 

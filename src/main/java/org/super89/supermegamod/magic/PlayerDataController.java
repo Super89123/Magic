@@ -201,10 +201,10 @@ public class PlayerDataController implements Listener {
 
             }
             if(meta.hasCustomModelData() && meta.getCustomModelData() == 2030 && getNowPlayerThrist(player) < 20){
-                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 2, 20));
+                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 4, 20));
             }
             if(meta.hasCustomModelData() && meta.getCustomModelData() == 2031 && getNowPlayerThrist(player) < 20){
-                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 3, 20));
+                setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 6, 20));
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 100 * 20, 10, false,false,false));
             }
 
