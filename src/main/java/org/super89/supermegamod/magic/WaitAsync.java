@@ -14,6 +14,7 @@ public class WaitAsync {
 
     public void waitAsync(int time, ItemStack item, Inventory inventory) {
         scheduler.runTaskLaterAsynchronously(Magic.getPlugin(), () -> {
+
             // Do nothing, just wait
         }, time * 20L); // Convert seconds to ticks (20 ticks per second)
     }

@@ -3,6 +3,7 @@ package org.super89.supermegamod.magic;
 
 
 
+import dev.lone.itemsadder.api.CustomBlock;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -29,6 +30,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -50,6 +52,7 @@ import java.io.IOException;
 import java.util.*;
 
 public final class Magic extends JavaPlugin implements Listener {
+
     public final String NAME = "Quantov";
 
 
@@ -492,9 +495,10 @@ public final class Magic extends JavaPlugin implements Listener {
     @EventHandler
     public void onNoteBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        if (block.getType() == Material.NOTE_BLOCK && block instanceof  NoteBlock) {
-            NoteBlock noteBlock = (NoteBlock) block;
-            if(noteBlock.getInstrument().equals(Instrument.GUITAR) && noteBlock.getNote().getOctave() == 22){
+        if (block.getType() == Material.NOTE_BLOCK) {
+            if(CustomBlock.byAlreadyPlaced(block).getNamespacedID().equals("puffer")){
+
+
             Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
@@ -513,6 +517,7 @@ public final class Magic extends JavaPlugin implements Listener {
         }
         }
     }
+
 
     // Метод для создания меню улучшений
     private void createUpgradeInventory(Location location) {
@@ -535,35 +540,33 @@ public final class Magic extends JavaPlugin implements Listener {
         return pufferManager.pufferUpgradeInventories.get(noteBlock.getLocation());
     }
 
-    // Обработчик взаимодействия с очистителем
+
     @EventHandler
     public void onPlayerInteract1(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.NOTE_BLOCK) {
-            if (event.getClickedBlock() instanceof NoteBlock){
-
-            NoteBlock noteBlock1 = (NoteBlock) event.getClickedBlock();
-            if(noteBlock1.getNote().getOctave() == 22 && noteBlock1.getInstrument().equals(Instrument.GUITAR)){
-                Block noteBlock = event.getClickedBlock();
+            if(CustomBlock.byAlreadyPlaced(event.getClickedBlock()).getNamespacedID().equals("puffer")){
+            Block noteBlock = event.getClickedBlock();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
                 event.getPlayer().openInventory(inventory);
-                event.setCancelled(true); // Отменяем стандартное взаимодействие
+                event.setCancelled(true);
             } else {
-                // Проверяем, не нажали ли на кнопку улучшений
+
                 if (event.getClickedBlock().getLocation().getBlockX() == noteBlock.getLocation().getBlockX() && event.getClickedBlock().getLocation().getBlockY() == noteBlock.getLocation().getBlockY() && event.getClickedBlock().getLocation().getBlockZ() == noteBlock.getLocation().getBlockZ()) {
                     if (event.getHand() == EquipmentSlot.HAND && event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
                         Inventory upgradeInventory = getUpgradeInventory(noteBlock);
                         if (upgradeInventory != null) {
                             event.getPlayer().openInventory(upgradeInventory);
-                            event.setCancelled(true); // Отменяем стандартное взаимодействие
+                            event.setCancelled(true);
                         }
                     }
                 }
             }
         }
     }
-        }
     }
+
+
 
     // Обработчик кликов в инвентаре очистителя
     @EventHandler
@@ -680,19 +683,19 @@ public final class Magic extends JavaPlugin implements Listener {
 
         ItemStack result3 = new ItemStack(Material.POTION);
         ItemMeta result3ItemMeta = result1.getItemMeta();
-        result3ItemMeta.setCustomModelData(2034);
+        result3ItemMeta.setCustomModelData(10000);
         result3ItemMeta.setDisplayName(ChatColor.WHITE + "Кружка с водой");
         result3.setItemMeta(result2ItemMeta);
 
         ItemStack result4 = new ItemStack(Material.POTION);
         ItemMeta result4ItemMeta = result1.getItemMeta();
-        result4ItemMeta.setCustomModelData(2035);
+        result4ItemMeta.setCustomModelData(10000);
         result4ItemMeta.setDisplayName(ChatColor.WHITE + "Кружка с водой+");
         result4.setItemMeta(result2ItemMeta);
 
         ItemStack cup = new ItemStack(Material.GLASS_BOTTLE);
         ItemMeta cupmeta = cup.getItemMeta();
-        cupmeta.setCustomModelData(2033);
+        cupmeta.setCustomModelData(10000);
         cupmeta.setDisplayName(ChatColor.WHITE + "Кружка");
         cupmeta.setLore(Collections.singletonList("Остаток: " + 0 + "/" + 27));
         cup.setItemMeta(cupmeta);
@@ -701,7 +704,7 @@ public final class Magic extends JavaPlugin implements Listener {
             if(inventory.getItem(12).getType().equals(Material.LIME_WOOL)){
                 if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
@@ -711,7 +714,7 @@ public final class Magic extends JavaPlugin implements Listener {
                             waitAsync.waitAsync(10, result1, inventory);
                             inventory.setItem(25, result1);
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
                             ItemStack newDust = inventory.getItem(37);
@@ -734,7 +737,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
                 else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
@@ -753,7 +756,7 @@ public final class Magic extends JavaPlugin implements Listener {
                             waitAsync.waitAsync(10, result4, inventory);
                             inventory.setItem(25, result3);
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
                             ItemMeta newCupMeta = newCup.getItemMeta();
@@ -789,7 +792,7 @@ public final class Magic extends JavaPlugin implements Listener {
             else if (inventory.getItem(12).getType().equals(Material.RED_WOOL) && inventory.getItem(21).getType().equals(Material.LIME_WOOL)) {
                 if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
@@ -797,15 +800,17 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result1, inventory);
+                            inventory.setItem(25, result1);
 
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
                             ItemStack newDust = inventory.getItem(37);
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result2, inventory);
+                            inventory.setItem(25, result2);
 
 
                         }
@@ -822,7 +827,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
                 else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
@@ -836,9 +841,10 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result3, inventory);
+                            inventory.setItem(25, result3);
 
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
                             ItemMeta newCupMeta = newCup.getItemMeta();
@@ -851,6 +857,7 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result4, inventory);
+                            inventory.setItem(25, result4);
 
 
                         }
@@ -875,7 +882,7 @@ public final class Magic extends JavaPlugin implements Listener {
             else if (inventory.getItem(12).getType().equals(Material.RED_WOOL) && inventory.getItem(21).getType().equals(Material.RED_WOOL) && inventory.getItem(30).getType().equals(Material.LIME_WOOL)) {
                 if(inventory.getItem(22).getType().equals(Material.GLASS_BOTTLE)){
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
@@ -883,15 +890,17 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result1, inventory);
+                            inventory.setItem(25, result1);
 
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
                             inventory.setItem(22, ItemUtils.create(Material.GLASS_BOTTLE, "", inventory.getItem(22).getAmount()-1, (byte) 0));
                             ItemStack newDust = inventory.getItem(37);
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result2, inventory);
+                            inventory.setItem(25, result2);
 
 
                         }
@@ -908,7 +917,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
                 else if (inventory.getItem(22).hasItemMeta() && inventory.getItem(22).getItemMeta().hasCustomModelData() && inventory.getItem(22).getItemMeta().getCustomModelData() == 2033) {
                     if(inventory.getItem(37).getType().equals(Material.PAPER) && inventory.getItem(37).hasItemMeta() && inventory.getItem(37).getItemMeta().hasCustomModelData()){
-                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 2029){
+                        if(inventory.getItem(37).getItemMeta().getCustomModelData() == 10260){
 
                             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
@@ -922,9 +931,10 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result3, inventory);
+                            inventory.setItem(25, result3);
 
                         }
-                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 2032) {
+                        else if (inventory.getItem(37).getItemMeta().getCustomModelData() == 10263) {
                             inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
                             ItemStack newCup = new ItemStack(cup);
                             ItemMeta newCupMeta = newCup.getItemMeta();
@@ -937,6 +947,7 @@ public final class Magic extends JavaPlugin implements Listener {
                             newDust.setAmount(newDust.getAmount()-1);
                             inventory.setItem(37, newDust);
                             waitAsync.waitAsync(10, result4, inventory);
+                            inventory.setItem(25, result4);
 
 
                         }
@@ -1022,6 +1033,30 @@ public final class Magic extends JavaPlugin implements Listener {
             }
         }
         return null;
+    }
+    @EventHandler
+    public void movementEvent(PlayerMoveEvent event){
+       if(playerDataController.getNowPlayerState(event.getPlayer()) != -1){
+        if(event.hasChangedBlock()){
+            Player player = event.getPlayer();
+            Location location = player.getLocation();
+            location.setY(location.getY() + 1);
+            Block block = location.getBlock();
+            if(block.getType().equals(Material.AIR)){
+                block.setType(Material.BARRIER);
+                BarrierBlocks.put(location, block);
+            }
+
+
+
+        }
+    }
+       if(playerDataController.getNowPlayerState(event.getPlayer()) == -1){
+           for(Block block : BarrierBlocks.values()){
+               block.setType(Material.AIR);
+               BarrierBlocks.remove(block.getLocation(), block);
+           }
+       }
     }
 
     public static Magic getPlugin() {
