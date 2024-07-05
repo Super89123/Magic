@@ -23,10 +23,17 @@ public class CustomPotion implements Listener {
             meta.setCustomModelData(2026);
             meta.setDisplayName("§bЗелье Маны");
             potion.setItemMeta(meta);
-            inventory.setItem(0, potion);
-            inventory.setItem(1, potion);
-            inventory.setItem(2, potion);
-            inventory.setItem(3, new ItemStack(Material.AIR));
+            if(!inventory.getItem(0).getType().equals(Material.AIR)) {
+                inventory.setItem(0, potion);
+            }
+            if(!inventory.getItem(1).getType().equals(Material.AIR)) {
+                inventory.setItem(1, potion);
+            }
+            if(!inventory.getItem(2).getType().equals(Material.AIR)) {
+                inventory.setItem(2, potion);
+            }
+            item.setAmount(item.getAmount()-1);
+            inventory.setItem(3, item);
             event1.setCancelled(true);
 
 

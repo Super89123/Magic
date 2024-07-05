@@ -365,8 +365,8 @@ public final class Magic extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 0L, 10L); // Запускаем задачу с интервалом 10 тиков (0.5 секунды)
     }
 
-    @EventHandler
-    public void damageEvent(EntityDamageEvent event){
+
+            /* public void damageEvent(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
             if (player.getHealth()-event.getDamage() > 2) {
@@ -410,7 +410,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
         }
 
-    }
+    }*/
 
 
     @EventHandler

@@ -25,7 +25,7 @@ public class ReviewBook implements Listener {
             }
             playerDataController.setNowPlayerMana(player, 0);
             player.playSound((Entity) player, Sound.BLOCK_PORTAL_TRAVEL, 100, 100);
-            event.getItem().setType(Material.AIR);
+            event.getItem().setAmount(event.getItem().getAmount()-1);
         }
     }
 }

@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class FireBook implements Listener {
+    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
     public void spawnFireParticlesAroundPlayer(Player player) {
         World world = player.getWorld();
         double playerX = player.getLocation().getX();
@@ -30,7 +31,7 @@ public class FireBook implements Listener {
     public void onplayer(PlayerInteractEvent e){
         Player player = e.getPlayer();
         ItemStack itemStack = e.getItem();
-        if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 10008){
+        if(e.getItem() != null && e.getAction() == Action.RIGHT_CLICK_AIR && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() == 10008 && playerDataController.getNowPlayerMana(player) >=15){
             spawnFireParticlesAroundPlayer(player);
             for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof LivingEntity) {
@@ -39,6 +40,7 @@ public class FireBook implements Listener {
                     player.playSound(player, Sound.ENTITY_BLAZE_SHOOT, 100, 100);
                 }
             }
+            playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-15);
 
         }
 

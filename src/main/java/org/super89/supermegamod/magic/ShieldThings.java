@@ -17,8 +17,9 @@ public class ShieldThings implements Listener {
             Player player = (Player) event.getEntity();
             ItemStack shield = player.getInventory().getItemInOffHand();
 
+
             // Проверяем, экипирован ли щит
-            if (shield.getType() == Material.SHIELD) {
+            if (shield.getType() == Material.SHIELD && shield.hasItemMeta() && shield.getItemMeta().hasCustomModelData()) {
                 // Получаем тип щита по CustomModelData
                 ShieldType shieldType = ShieldType.getShieldType(shield.getItemMeta().getCustomModelData());
 
@@ -26,6 +27,7 @@ public class ShieldThings implements Listener {
                 if (shieldType != null) {
                     if(event.getDamage() > shieldType.getDamageReduction()){
                         player.damage(event.getDamage());
+                        event.setCancelled(true);
                     }
 
 
@@ -33,8 +35,17 @@ public class ShieldThings implements Listener {
                 else{
                     if(event.getDamage() > 5){
                         player.damage(event.getDamage());
+                        event.setCancelled(true);
                     }
                 }
+            } else if (shield.getType().equals(Material.SHIELD) && !shield.hasItemMeta() && !shield.getItemMeta().hasCustomModelData()) {
+                if(event.getDamage() > 5){
+                    player.damage(event.getDamage());
+                    event.setCancelled(true);
+                }
+
+
+
             }
         }
     }

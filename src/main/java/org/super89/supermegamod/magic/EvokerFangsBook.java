@@ -13,12 +13,14 @@ import org.bukkit.util.Vector;
 import org.super89.supermegamod.magic.Utils.ItemUtils;
 
 public class EvokerFangsBook implements Listener {
+    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
     @EventHandler
 
 
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10006 && event.getItem().getItemMeta().hasCustomModelData()) {
+            if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10006 && event.getItem().getItemMeta().hasCustomModelData() && playerDataController.getNowPlayerMana(event.getPlayer()) >=10){
+
                 Player player = event.getPlayer();
 
                 double yaw = player.getLocation().getYaw();
@@ -40,6 +42,7 @@ public class EvokerFangsBook implements Listener {
 
                     }
                     player.playSound((Entity) player, Sound.ENTITY_EVOKER_CELEBRATE, 100 , 100);
+                    playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-10);
                 }
             }
         }
