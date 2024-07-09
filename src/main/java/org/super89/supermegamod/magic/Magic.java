@@ -279,7 +279,7 @@ public final class Magic extends JavaPlugin implements Listener {
     }
     @Override
     public void onDisable(){
-        saveInventories();
+
     }
 
     @EventHandler
@@ -565,7 +565,6 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onPlayerInteract1(CustomBlockInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if(CustomBlock.byAlreadyPlaced(event.getBlockClicked()).getId().equals("puffer")){
-            loadInventories();
             Block noteBlock = event.getBlockClicked();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
@@ -663,6 +662,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
             pufferManager.pufferInventories.replace(location, inventory);
+            saveInventories();
         } else if (pufferManager.pufferUpgradeInventories.containsValue(event.getClickedInventory())) {
             // Логика взаимодействия с меню улучшений
             Location location = getKeyByValue(pufferManager.pufferUpgradeInventories, inventory);
