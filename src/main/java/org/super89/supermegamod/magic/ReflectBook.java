@@ -30,13 +30,19 @@ public class ReflectBook implements Listener {
         ItemStack item = event.getItem();
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (item != null && item.getType().equals(Material.BOOK) && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1006 && playerDataController.getNowPlayerMana(player) >=50) {
+            if (item != null && item.getType().equals(Material.BOOK) && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1006 && playerDataController.getNowPlayerMana(player) >=50){
+                if(player.getCooldown(Material.BOOK) == 0) {
 
-                long endTime = System.currentTimeMillis() + 5 * 60 * 1000;
-                activePlayers.put(player, endTime);
-                player.sendMessage(ChatColor.GREEN + "Шипы активированы!");
-                player.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 100, 100);
-                playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-50);
+                    long endTime = System.currentTimeMillis() + 5 * 60 * 1000;
+                    activePlayers.put(player, endTime);
+                    player.sendMessage(ChatColor.GREEN + "Шипы активированы!");
+                    player.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 100, 100);
+                    playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 50);
+                    player.setCooldown(Material.BOOK, 40);
+                }
+                else {
+                    player.sendMessage(ChatColor.RED+"Подождите чуть-чуть!");
+                }
             }
         }
     }

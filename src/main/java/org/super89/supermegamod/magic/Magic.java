@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -86,31 +87,28 @@ public final class Magic extends JavaPlugin implements Listener {
             throw new RuntimeException(e);
         }
 
-
+       // Регистрация ивентов
         getServer().getPluginManager().registerEvents(this, this);
-
         getServer().getPluginManager().registerEvents(new LevitationBook(), this);
         getServer().getPluginManager().registerEvents(new SonicBook(), this);
-
-
-
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
         Bukkit.getPluginManager().registerEvents(playerDataController, this);
-
         Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(), this);
         Bukkit.getPluginManager().registerEvents(new MineBook(), this);
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
         Bukkit.getPluginManager().registerEvents(new InventoryWithCoolThings(), this);
         Bukkit.getPluginManager().registerEvents(pufferManager, this);
         Bukkit.getPluginManager().registerEvents(new ShieldThings(), this);
-
         Bukkit.getPluginManager().registerEvents(new ReflectBook(), this);
         Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
 
         Bukkit.getPluginManager().registerEvents(new WindBook(), this);
         Bukkit.getPluginManager().registerEvents(new FireBook(), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
+
+
+        /* Устаревшая версия. Используется CustomCrafting.
 
 
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
@@ -167,7 +165,7 @@ public final class Magic extends JavaPlugin implements Listener {
         prismarine_dust.setItemMeta(prismarine_dust_meta);
         prismarine_dust.setAmount(5);
         StonecuttingRecipe recipe123456 = new StonecuttingRecipe(NamespacedKey.minecraft("prismarine_dust"), prismarine_dust, Material.PRISMARINE_SHARD);
-        Bukkit.addRecipe(recipe123456);
+        Bukkit.addRecipe(recipe123456);*/
 
 
 
@@ -211,7 +209,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10003) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "   " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
 
 
 
@@ -287,14 +285,20 @@ public final class Magic extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-
-
+        if(player.getCooldown(Material.BOOK) == 0){
         if (player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 10005 && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && playerDataController.getNowPlayerMana(player)>=10) {
             playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-10);
 
             Location targetLocation = player.getTargetBlock(null, 100).getLocation();
             createParticleCube(targetLocation, 5, 5, 5, Particle.SCULK_SOUL);
             freezeAndDamagePlayersInParticles(targetLocation, 5, 5, 5, 3, 0.1, player.getWorld());
+            player.setCooldown(Material.BOOK, 10);
+        }
+
+
+        }
+        else {
+            player.sendMessage(ChatColor.RED+ "Подождите чуть-чуть!");
         }
     }
 
@@ -446,7 +450,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Arrow arrow = (Arrow) event.getEntity();
         if (!(event.getEntity().getShooter() instanceof Player)) return;
         Player shooter = (Player) event.getEntity().getShooter();
-        if(shooter.getInventory().getItemInMainHand().hasItemMeta() && shooter.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW) && shooter.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && shooter.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1449){
+        if(shooter.getInventory().getItemInMainHand().hasItemMeta() && shooter.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW) && shooter.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && shooter.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 10000){
 
             Entity nearbyEntity = arrow.getNearbyEntities(10, 10, 10).stream()
                     .filter(entity -> entity instanceof LivingEntity && entity != shooter) // Исключаем стрелка из поиска
@@ -460,6 +464,7 @@ public final class Magic extends JavaPlugin implements Listener {
         }
 
     }
+
     @EventHandler
     public void deathEvenet(PlayerDeathEvent event){
         Player player = event.getPlayer();
@@ -493,10 +498,11 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onNoteBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         if (block.getType() == Material.NOTE_BLOCK && pufferManager.pufferInventories.containsKey(block.getLocation())){
-            Inventory inventory = pufferManager.pufferInventories.remove(block.getLocation());
+            Inventory inventory = pufferManager.pufferInventories.get(block.getLocation());
             removeInventoryFromFile(block.getLocation());
             pufferManager.pufferUpgradeInventories.remove(block.getLocation());
             Location location = block.getLocation();
+            saveInventories();
             for (ItemStack item : inventory.getContents()) {
                 if ((item != null) && !item.getType().equals(Material.LIME_WOOL) && !item.getType().equals(Material.RED_WOOL) && !item.getType().equals(Material.PURPLE_STAINED_GLASS_PANE) && !item.getType().equals(Material.LIGHT_GRAY_STAINED_GLASS_PANE) && !item.getType().equals(Material.GRAY_STAINED_GLASS_PANE) && !item.getType().equals(Material.GREEN_WOOL)) {
                     location.getWorld().dropItemNaturally(location, item);
@@ -528,6 +534,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
             pufferManager.pufferInventories.put(block.getLocation(), inventory);
+            saveInventories();
             createUpgradeInventory(block.getLocation()); // Создаем меню улучшений
         }
         }
@@ -560,6 +567,7 @@ public final class Magic extends JavaPlugin implements Listener {
     public void onPlayerInteract1(CustomBlockInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if(CustomBlock.byAlreadyPlaced(event.getBlockClicked()).getId().equals("puffer")){
+            loadInventories();
             Block noteBlock = event.getBlockClicked();
             Inventory inventory = getPufferInventory(noteBlock);
             if (inventory != null) {
@@ -648,8 +656,9 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
                 if(event.getSlot() == 53){
-                    player.openInventory(getUpgradeInventory(Objects.requireNonNull(getKeyByValue(pufferManager.pufferInventories, inventory)).getBlock()));
                     event.setCancelled(true);
+                    player.openInventory(getUpgradeInventory(Objects.requireNonNull(getKeyByValue(pufferManager.pufferInventories, inventory)).getBlock()));
+
                 }
 
             }

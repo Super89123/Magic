@@ -1,6 +1,7 @@
 package org.super89.supermegamod.magic;
 
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -29,13 +30,19 @@ public class TeleportBook implements Listener {
 
 
             if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10000 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
+                if(player.getCooldown(Material.BOOK) == 0) {
 
-                playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-20);
-                Location location = player.getLocation();
-                Vector direction = location.getDirection().normalize().multiply(5);
-                Location teleportLocation = location.add(direction);
-                player.teleport(teleportLocation);
-                player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 100, 100);
+                    playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 20);
+                    Location location = player.getLocation();
+                    Vector direction = location.getDirection().normalize().multiply(5);
+                    Location teleportLocation = location.add(direction);
+                    player.teleport(teleportLocation);
+                    player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 100, 100);
+                    player.setCooldown(Material.BOOK, 10);
+                }
+                else {
+                    player.sendMessage(ChatColor.RED+"Подождите чуть-чуть!");
+                }
             }
         }
     }

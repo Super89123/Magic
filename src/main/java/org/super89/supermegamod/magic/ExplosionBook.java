@@ -1,5 +1,6 @@
 package org.super89.supermegamod.magic;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -27,7 +28,8 @@ public class ExplosionBook implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (event.getAction().name().contains("RIGHT_CLICK") && item.getType() == Material.BOOK) {
+        if (event.getAction().isRightClick() && item.getType() == Material.BOOK) {
+            if(player.getCooldown(Material.BOOK) == 0){
             if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10009 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
                 playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-25);
 
@@ -38,11 +40,13 @@ public class ExplosionBook implements Listener {
                 Location location = player.getLocation();
                 Vector direction = location.getDirection();
                 location.add(direction);
-                location.getWorld().createExplosion(location, 4.0f);
+                location.getWorld().createExplosion(location, 2.5f);
                 player.playSound(player, Sound.ENTITY_CREEPER_PRIMED, 100, 100);
+                player.setCooldown(Material.BOOK, 10);
 
 
             }
-        }
+        }else {player.sendMessage(ChatColor.RED  + "Подождите чуть-чуть!");}
     }
+}
 }

@@ -52,7 +52,12 @@ public class InventoryWithCoolThings implements Listener {
             setItem(Material.BOOK, 1010, inventory, 10, "Книга Защиты");
             setItem(Material.BOOK, 10008, inventory, 11, "Книга Огня");
             setItem(Material.BOOK, 10001, inventory, 12, "Книга Ветра");
-            setItem(Material.CROSSBOW, 1449, inventory, 13, "Автоматон");
+            setItem(Material.CROSSBOW, 10000, inventory, 13, "Автоматон");
+            setItem(Material.CROSSBOW, 10001, inventory, 25, "Автоматон");
+            setItem(Material.CROSSBOW, 10002, inventory, 26, "Автоматон");
+            setItem(Material.CROSSBOW, 10003, inventory, 27, "Автоматон");
+            setItem(Material.CROSSBOW, 10004, inventory, 28, "Автоматон");
+            setItem(Material.CROSSBOW, 10005, inventory, 29, "Автоматон");
             setItem(Material.SHIELD, 1020, inventory, 14, "Незеритовый щит");
             setItem(Material.SHIELD, 1021, inventory, 15, "Железный щит");
             setItem(Material.POTION, 2026, inventory, 16, "§bЗелье Маны");

@@ -1,6 +1,7 @@
 package org.super89.supermegamod.magic;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -19,6 +20,7 @@ public class EvokerFangsBook implements Listener {
 
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if(event.getPlayer().getCooldown(Material.BOOK) == 0){
             if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10006 && event.getItem().getItemMeta().hasCustomModelData() && playerDataController.getNowPlayerMana(event.getPlayer()) >=10){
 
                 Player player = event.getPlayer();
@@ -43,8 +45,11 @@ public class EvokerFangsBook implements Listener {
                     }
                     player.playSound((Entity) player, Sound.ENTITY_EVOKER_CELEBRATE, 100 , 100);
                     playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-10);
+                    player.setCooldown(Material.BOOK, 10);
                 }
             }
         }
+            event.getPlayer().sendMessage("Подождите чуть-чуть!");
+    }
     }
 }
