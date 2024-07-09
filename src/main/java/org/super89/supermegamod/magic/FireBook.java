@@ -45,9 +45,7 @@ public class FireBook implements Listener {
             playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-15);
             player.setCooldown(Material.BOOK, 10);
 
-        }else {
-                player.sendMessage(ChatColor.RED + "Подождите чуть-чуть!");
-            }
+        }
         }
 
     }

@@ -29,7 +29,7 @@ public class TeleportBook implements Listener {
         if (item != null && item.getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 1002) {
 
 
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10000 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock() == null) {
+            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10000 && playerDataController.getNowPlayerMana(player)>= 20 && event.getClickedBlock().getType().equals(Material.AIR) ) {
                 if(player.getCooldown(Material.BOOK) == 0) {
 
                     playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 20);
@@ -40,9 +40,7 @@ public class TeleportBook implements Listener {
                     player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 100, 100);
                     player.setCooldown(Material.BOOK, 10);
                 }
-                else {
-                    player.sendMessage(ChatColor.RED+"Подождите чуть-чуть!");
-                }
+
             }
         }
     }

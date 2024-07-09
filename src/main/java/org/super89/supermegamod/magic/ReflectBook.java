@@ -40,9 +40,7 @@ public class ReflectBook implements Listener {
                     playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 50);
                     player.setCooldown(Material.BOOK, 40);
                 }
-                else {
-                    player.sendMessage(ChatColor.RED+"Подождите чуть-чуть!");
-                }
+
             }
         }
     }

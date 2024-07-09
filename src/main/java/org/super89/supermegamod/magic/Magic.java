@@ -297,9 +297,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
         }
-        else {
-            player.sendMessage(ChatColor.RED+ "Подождите чуть-чуть!");
-        }
+
     }
 
     private void createParticleCube(Location location, int width, int height, int depth, Particle particle) {

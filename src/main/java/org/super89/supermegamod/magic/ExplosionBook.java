@@ -29,24 +29,21 @@ public class ExplosionBook implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (event.getAction().isRightClick() && item.getType() == Material.BOOK) {
-            if(player.getCooldown(Material.BOOK) == 0){
-            if(item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10009 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR){
-                playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)-25);
+            if (player.getCooldown(Material.BOOK) == 0) {
+                if (item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10009 && playerDataController.getNowPlayerMana(player) >= 25 && Objects.requireNonNull(event.getClickedBlock()).getType() != Material.AIR) {
+                    playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 25);
 
 
+                    Location location = player.getLocation();
+                    Vector direction = location.getDirection();
+                    location.add(direction);
+                    location.getWorld().createExplosion(location, 2.5f);
+                    player.playSound(player, Sound.ENTITY_CREEPER_PRIMED, 100, 100);
+                    player.setCooldown(Material.BOOK, 10);
 
 
-
-                Location location = player.getLocation();
-                Vector direction = location.getDirection();
-                location.add(direction);
-                location.getWorld().createExplosion(location, 2.5f);
-                player.playSound(player, Sound.ENTITY_CREEPER_PRIMED, 100, 100);
-                player.setCooldown(Material.BOOK, 10);
-
+                }
 
             }
-        }else {player.sendMessage(ChatColor.RED  + "Подождите чуть-чуть!");}
-    }
-}
-}
+        }
+    }}

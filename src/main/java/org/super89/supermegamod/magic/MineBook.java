@@ -23,9 +23,7 @@ public class MineBook implements Listener {
                 playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 40);
                 player.setCooldown(Material.BOOK, 40);
             }
-            else {
-                player.sendMessage(ChatColor.RED+"Подождите чуть-чуть!");
-            }
+
 
         }
     }

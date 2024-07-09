@@ -29,9 +29,7 @@ public class ReviewBook implements Listener {
                 event.getItem().setAmount(event.getItem().getAmount() - 1);
                 player.setCooldown(Material.BOOK, 40);
             }
-            else {
-                player.sendMessage(ChatColor.RED+"Подождите чуть-чут!");
-            }
+
         }
     }
 }
