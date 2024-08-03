@@ -204,7 +204,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     }
                     ItemStack item = player.getInventory().getItemInOffHand();
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 50, 2, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 50, 2, false, false, false));
                     }
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10003) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
@@ -218,7 +218,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
                     if (playerDataController.getNowPlayerThrist(player) == 0) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 5, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 50, 5, false, false, false));
                     }
 
 
@@ -249,7 +249,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (a != -1) {
 
                         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, false, false));
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 2, false, false, false));
 
 
 
@@ -346,7 +346,7 @@ public final class Magic extends JavaPlugin implements Listener {
     }
 
     private void freezePlayer(LivingEntity entity, int durationSeconds) {
-        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, durationSeconds * 20, 255, false, false, false)); // Устанавливаем скорость ходьбы 0
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, durationSeconds * 20, 255, false, false, false)); // Устанавливаем скорость ходьбы 0
 
 
 
@@ -482,7 +482,7 @@ public final class Magic extends JavaPlugin implements Listener {
         ThrownPotion potion = event.getPotion();
         @NotNull Collection<PotionEffect> effectType = potion.getEffects();
 
-        if (effectType.contains(PotionEffectType.HEALTH_BOOST) || effectType.contains(PotionEffectType.HEAL) || effectType.contains(PotionEffectType.REGENERATION)) {
+        if (effectType.contains(PotionEffectType.HEALTH_BOOST) || effectType.contains(PotionEffectType.INSTANT_HEALTH) || effectType.contains(PotionEffectType.REGENERATION)) {
             for (LivingEntity entity : event.getAffectedEntities()) {
                 if (entity instanceof Player) {
                     Player player = (Player) entity;

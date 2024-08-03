@@ -2,6 +2,7 @@ package org.super89.supermegamod.magic;
 
 
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -12,6 +13,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -33,159 +36,58 @@ public class PlayerDataController implements Listener {
 
 
     private Magic plugin;
+    private NamespacedKey thristKey = new NamespacedKey(Magic.getPlugin(), "thrist");
+    private NamespacedKey manaKey = new NamespacedKey(Magic.getPlugin(), "mana");
+    private NamespacedKey kritKey = new NamespacedKey(Magic.getPlugin(), "krit");
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
     String bottlefull3 = bottle3;
     String bottlefull2 = bottle2;
     String bottlefull = bottle;
 
-
-
-
     public int getNowPlayerMana(Player player) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        int a = playerDataConfig.getInt(playerUUID + "." + "nowmana");
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return a;
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        return con.get(manaKey, PersistentDataType.INTEGER);
     }
     public void setNowPlayerMana(Player player, int mana) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        playerDataConfig.set(playerUUID + "." + "nowmana", mana);
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
-
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        con.set(manaKey, PersistentDataType.INTEGER, mana);
     }
     public void setNowPlayerThrist(Player player, int thrist) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        playerDataConfig.set(playerUUID + "." + "nowthrist", thrist);
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        con.set(thristKey, PersistentDataType.INTEGER, thrist);
 
     }
     public int getNowPlayerThrist(Player player) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        int a = playerDataConfig.getInt(playerUUID + "." + "nowthrist");
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return a;
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        return con.get(thristKey, PersistentDataType.INTEGER);
     }
     public int getNowPlayerState(Player player) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        int a = playerDataConfig.getInt(playerUUID + "." + "ostatokprm");
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return a;
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        return con.get(kritKey, PersistentDataType.INTEGER);
     }
 
 
     public int getMaxPlayerMana(Player player) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        int a = playerDataConfig.getInt(playerUUID + "." + "maxmana");
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return a;
+        return 100;
     }
 
-    public void setMaxPlayerMana(Player player, int maxmana) {
-        String playerUUID = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        playerDataConfig.set(playerUUID + "." + "maxmana", maxmana);
-
-        try {
-            playerDataConfig.save(playerDataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
         public void setNowPlayerPkm(Player player, int ostatokprm) {
-            String playerUUID = player.getUniqueId().toString();
-            File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-            FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-            playerDataConfig.set(playerUUID + "." + "ostatokprm", ostatokprm);
+            PersistentDataContainer con = player.getPersistentDataContainer();
 
-            try {
-                playerDataConfig.save(playerDataFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-
-
+            con.set(kritKey, PersistentDataType.INTEGER, ostatokprm);
     }
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        String uuid = player.getUniqueId().toString();
-        File playerDataFile = new File(Magic.getPlugin().getDataFolder(), "playerdata.yml");
-        FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-        if(!player.hasPlayedBefore()){
-            playerDataConfig.set(uuid + "." + "maxmana", 100);
-            playerDataConfig.set(uuid + "." + "nowmana", 100);
-            playerDataConfig.set(uuid + "." + "prokachka", 0);
-            playerDataConfig.set(uuid + "." + "nowthrist", 20);
-            playerDataConfig.set(uuid + "." + "ostatokprm", -1);
-            int slot = 17;
-            try {
-                playerDataConfig.save(playerDataFile);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
 
 
 
+        PersistentDataContainer con = player.getPersistentDataContainer();
+        if (!player.hasPlayedBefore()) {
+            con.set(thristKey, PersistentDataType.INTEGER, 20);
+            con.set(manaKey, PersistentDataType.INTEGER, 0);
+            con.set(kritKey, PersistentDataType.INTEGER, -1);
         }
-
-
 
     }
     @EventHandler
@@ -196,7 +98,7 @@ public class PlayerDataController implements Listener {
             PotionMeta meta = (PotionMeta) item.getItemMeta();
             if(meta.getBasePotionType().equals(PotionType.WATER) || meta.getBasePotionType().equals(PotionType.AWKWARD) || meta.getBasePotionType().equals(PotionType.MUNDANE) && getNowPlayerThrist(player) < 20){
                 player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 25 * 20, 2));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 25 * 20, 2));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 25 * 20, 2));
                 setNowPlayerThrist(player, Math.min(getNowPlayerThrist(player) + 1, 20));
 
             }

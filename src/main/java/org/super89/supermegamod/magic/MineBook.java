@@ -18,7 +18,7 @@ public class MineBook implements Listener {
         player.getInventory().getItemInMainHand();
         if(player.getInventory().getItemInMainHand().hasItemMeta() && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 10002 && playerDataController.getNowPlayerMana(player) >= 40){
             if(player.getCooldown(Material.BOOK) == 0) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 300 * 20, 1, false, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 300 * 20, 1, false, false, false));
                 player.playSound(player, Sound.ENTITY_ENDERMAN_HURT, 100, 100);
                 playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player) - 40);
                 player.setCooldown(Material.BOOK, 40);
