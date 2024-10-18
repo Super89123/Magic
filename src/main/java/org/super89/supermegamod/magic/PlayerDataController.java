@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionType;
 
 
 public class PlayerDataController implements Listener {
+
     String bottle3 = "\uE026";
     String bottle2 = "\uE025";
     String bottle = "\uE024";
@@ -33,32 +34,46 @@ public class PlayerDataController implements Listener {
 
 
     private Magic plugin;
-    private NamespacedKey thristKey = new NamespacedKey(Magic.getPlugin(), "thrist");
-    private NamespacedKey manaKey = new NamespacedKey(Magic.getPlugin(), "mana");
-    private NamespacedKey kritKey = new NamespacedKey(Magic.getPlugin(), "krit");
+
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
+
     String bottlefull3 = bottle3;
     String bottlefull2 = bottle2;
     String bottlefull = bottle;
 
     public int getNowPlayerMana(Player player) {
+         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+         NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(manaKey, PersistentDataType.INTEGER);
     }
     public void setNowPlayerMana(Player player, int mana) {
+        NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+        NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         con.set(manaKey, PersistentDataType.INTEGER, mana);
     }
     public void setNowPlayerThrist(Player player, int thrist) {
+        NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+        NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         con.set(thristKey, PersistentDataType.INTEGER, thrist);
 
     }
     public int getNowPlayerThrist(Player player) {
+        NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+        NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(thristKey, PersistentDataType.INTEGER);
     }
     public int getNowPlayerState(Player player) {
+        NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+        NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(kritKey, PersistentDataType.INTEGER);
     }
@@ -69,12 +84,18 @@ public class PlayerDataController implements Listener {
     }
 
         public void setNowPlayerPkm(Player player, int ostatokprm) {
+            NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+            NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+            NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
             PersistentDataContainer con = player.getPersistentDataContainer();
 
             con.set(kritKey, PersistentDataType.INTEGER, ostatokprm);
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
+        NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
+        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
         Player player = event.getPlayer();
 
 

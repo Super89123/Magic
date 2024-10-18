@@ -71,7 +71,7 @@ public final class Magic extends JavaPlugin implements Listener {
             throw new RuntimeException(e);
         }
 
-       // Регистрация ивентов
+        // Регистрация ивентов
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new LevitationBook(), this);
         getServer().getPluginManager().registerEvents(new SonicBook(), this);
@@ -90,8 +90,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new WindBook(), this);
         Bukkit.getPluginManager().registerEvents(new FireBook(), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
-
-
+        Bukkit.getPluginManager().registerEvents(new Halloween(), this);
 
 
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
@@ -151,15 +150,8 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.addRecipe(recipe123456);
 
 
-
-
-
-
-
-
         plugin = this;
         loadInventories();
-
 
 
         new BukkitRunnable() {
@@ -192,12 +184,10 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10003) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    Жажда?", Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
-
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    Жажда?", Style.style(TextColor.color(59, 223, 235), TextDecoration.BOLD));
 
 
                     player.sendActionBar(actionbarMessage);
-
 
 
                     if (playerDataController.getNowPlayerThrist(player) == 0) {
@@ -235,10 +225,8 @@ public final class Magic extends JavaPlugin implements Listener {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 2, false, false, false));
 
 
-
-
                     }
-                    if(a == -1){
+                    if (a == -1) {
 
                     }
 
@@ -246,19 +234,6 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (Bukkit.getOnlinePlayers().isEmpty()) {
-                    return;
-                }
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (playerDataController.getNowPlayerThrist(player) > 0) {
-                        playerDataController.setNowPlayerThrist(player, playerDataController.getNowPlayerThrist(player) - 1);
-                    }
-                }
-            }
-        }.runTaskTimer(this, 0, 40 * 60);
     }
     @Override
     public void onDisable(){
