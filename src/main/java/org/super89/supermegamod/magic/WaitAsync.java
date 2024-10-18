@@ -3,7 +3,6 @@ package org.super89.supermegamod.magic;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
 
 public class WaitAsync {
     private final BukkitScheduler scheduler;

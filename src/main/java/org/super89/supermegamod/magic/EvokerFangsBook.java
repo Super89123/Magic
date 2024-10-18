@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
-import org.super89.supermegamod.magic.Utils.ItemUtils;
+
 
 public class EvokerFangsBook implements Listener {
     PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());

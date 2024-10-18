@@ -1,6 +1,5 @@
 package org.super89.supermegamod.magic;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

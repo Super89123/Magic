@@ -3,8 +3,6 @@ package org.super89.supermegamod.magic;
 
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,8 +21,7 @@ import org.bukkit.potion.PotionType;
 
 
 
-import java.io.File;
-import java.io.IOException;
+
 
 public class PlayerDataController implements Listener {
     String bottle3 = "\uE026";
