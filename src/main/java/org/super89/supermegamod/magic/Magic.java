@@ -3,9 +3,7 @@ package org.super89.supermegamod.magic;
 
 
 
-import dev.lone.itemsadder.api.CustomBlock;
-import dev.lone.itemsadder.api.Events.CustomBlockInteractEvent;
-import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -108,7 +106,6 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
 
 
-        /* Устаревшая версия. Используется CustomCrafting.
 
 
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
@@ -165,7 +162,7 @@ public final class Magic extends JavaPlugin implements Listener {
         prismarine_dust.setItemMeta(prismarine_dust_meta);
         prismarine_dust.setAmount(5);
         StonecuttingRecipe recipe123456 = new StonecuttingRecipe(NamespacedKey.minecraft("prismarine_dust"), prismarine_dust, Material.PRISMARINE_SHARD);
-        Bukkit.addRecipe(recipe123456);*/
+        Bukkit.addRecipe(recipe123456);
 
 
 
@@ -209,7 +206,7 @@ public final class Magic extends JavaPlugin implements Listener {
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10003) {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
                     }
-                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    " + playerDataController.calculatePlayerThirst(player), Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
+                    TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    Жажда?", Style.style(TextColor.color(59, 223,235), TextDecoration.BOLD));
 
 
 
@@ -509,33 +506,6 @@ public final class Magic extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
-    public void onNoteBlockPlace(CustomBlockPlaceEvent event) {
-        Block block = event.getBlock();
-
-
-            if(event.getCustomBlockItem().getItemMeta().getCustomModelData() == 10260){
-
-
-
-            Inventory inventory = Bukkit.createInventory(null, 54, "§4Очиститель " + block.getLocation().getBlockX() + " " + block.getLocation().getBlockY() + " " + block.getLocation().getBlockZ());
-            inventory.setItem(12, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(21, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(30, ItemUtils.create(Material.RED_WOOL, " "));
-            inventory.setItem(10, ItemUtils.create(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " "));
-
-            inventory.setItem(23, ItemUtils.create(Material.GREEN_WOOL, "§aЗапуск"));
-            inventory.setItem(53, ItemUtils.create(Material.GRAY_STAINED_GLASS_PANE, "§aУлучшения")); // Кнопка для меню улучшений
-            for (int i = 0; i < 54; i++) {
-                if (i != 10 && i != 12 && i != 21 && i != 30 && i != 37 && i != 22 && i != 25 && i != 53 && i != 23) {
-                    inventory.setItem(i, ItemUtils.create(Material.PURPLE_STAINED_GLASS_PANE, " "));
-                }
-            }
-            pufferManager.pufferInventories.put(block.getLocation(), inventory);
-            saveInventories();
-            createUpgradeInventory(block.getLocation()); // Создаем меню улучшений
-        }
-        }
 
 
 
@@ -561,30 +531,7 @@ public final class Magic extends JavaPlugin implements Listener {
     }
 
 
-    @EventHandler
-    public void onPlayerInteract1(CustomBlockInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if(CustomBlock.byAlreadyPlaced(event.getBlockClicked()).getId().equals("puffer")){
-            Block noteBlock = event.getBlockClicked();
-            Inventory inventory = getPufferInventory(noteBlock);
-            if (inventory != null) {
-                event.getPlayer().openInventory(inventory);
-                event.setCancelled(true);
-            } else {
 
-                if (event.getBlockClicked().getLocation().getBlockX() == noteBlock.getLocation().getBlockX() && event.getBlockClicked().getLocation().getBlockY() == noteBlock.getLocation().getBlockY() && event.getBlockClicked().getLocation().getBlockZ() == noteBlock.getLocation().getBlockZ()) {
-                    if (event.getHand() == EquipmentSlot.HAND && event.getBlockClicked() != null && event.getBlockClicked().getType() == Material.NOTE_BLOCK) {
-                        Inventory upgradeInventory = getUpgradeInventory(noteBlock);
-                        if (upgradeInventory != null) {
-                            event.getPlayer().openInventory(upgradeInventory);
-                            event.setCancelled(true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    }
 
 
 
