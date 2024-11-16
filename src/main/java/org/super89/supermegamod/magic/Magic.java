@@ -234,6 +234,16 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                Halloween halloween = new Halloween();
+                for(Zombie zombie : halloween.zombieList){
+                    zombie.playEffect(EntityEffect.ENTITY_DEATH);
+                }
+            }
+        }.runTaskTimer(plugin, 0, 40);
+        plugin = this;
     }
     @Override
     public void onDisable(){
