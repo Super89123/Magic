@@ -52,6 +52,7 @@ public final class Magic extends JavaPlugin implements Listener {
     private static Magic plugin;
     private FileConfiguration config1;
     private File configFile1;
+    private int hp;
     WaitAsync waitAsync = new WaitAsync(Bukkit.getScheduler());
 
 
@@ -152,6 +153,25 @@ public final class Magic extends JavaPlugin implements Listener {
 
         plugin = this;
         loadInventories();
+        YamlConfiguration config = new YamlConfiguration();
+        File file = new File(getDataFolder(), "config.yml");
+        try {
+            config.load(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        if(file.exists()){
+            int a = (int) config.get("hp");
+            this.hp = a;
+
+        }
+        else{
+            file.mkdirs();
+            config.set("hp", 5);
+        }
+
 
 
         new BukkitRunnable() {
@@ -182,7 +202,7 @@ public final class Magic extends JavaPlugin implements Listener {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 50, 2, false, false, false));
                     }
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 10003) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, 4, false, false, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 50, hp, false, false, false));
                     }
                     TextComponent actionbarMessage = Component.text("Мана: " + nowmana + "/" + maxmana + "    Жажда?", Style.style(TextColor.color(59, 223, 235), TextDecoration.BOLD));
 
