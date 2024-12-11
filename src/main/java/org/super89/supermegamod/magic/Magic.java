@@ -1,6 +1,12 @@
 package org.super89.supermegamod.magic;
 
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
@@ -32,11 +38,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
 import org.super89.supermegamod.magic.Utils.ItemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 
 public final class Magic extends JavaPlugin implements Listener {
 
@@ -54,6 +63,7 @@ public final class Magic extends JavaPlugin implements Listener {
     private File configFile1;
     private int hp;
     WaitAsync waitAsync = new WaitAsync(Bukkit.getScheduler());
+    private String token;
 
 
     public  Map<Location, Block> BarrierBlocks = new HashMap<>();
@@ -64,6 +74,8 @@ public final class Magic extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+
+
         configFile1 = new File(this.getDataFolder(), "puffers.yml");
         config1 = YamlConfiguration.loadConfiguration(configFile1);
         try {
@@ -91,7 +103,6 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new WindBook(), this);
         Bukkit.getPluginManager().registerEvents(new FireBook(), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
-        Bukkit.getPluginManager().registerEvents(new Halloween(), this);
 
 
         ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
@@ -165,12 +176,40 @@ public final class Magic extends JavaPlugin implements Listener {
         if(file.exists()){
             int a = (int) config.get("hp");
             this.hp = a;
+             this.token = (String) config.get("token");
 
         }
+        //ffff
         else{
             file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             config.set("hp", 5);
+            config.set("token", "YOUR_TOKEN_BOT");
+             this.token = (String) config.get("token");
         }
+        JDA jda = JDABuilder.createLight(token, Collections.emptyList())
+                .addEventListeners(new SlashCommandListener())
+                .build();
+
+        // Register your commands to make them visible globally on Discord:
+
+        CommandListUpdateAction commands = jda.updateCommands();
+
+        // Add all your commands on this action instance
+        commands.addCommands(
+                Commands.slash("players", "Makes the bot say what you tell it to")
+                        .setGuildOnly(true), // Accepting a user input
+                Commands.slash("leave", "Makes the bot leave the server")
+                        .setGuildOnly(true) // this doesn't make sense in DMs
+                        .setDefaultPermissions(DefaultMemberPermissions.DISABLED) // only admins should be able to use this command.
+        );
+
+        // Then finally send your commands to discord using the API
+        commands.queue();
 
 
 
@@ -254,15 +293,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
-        new BukkitRunnable(){
-            @Override
-            public void run(){
-                Halloween halloween = new Halloween();
-                for(Zombie zombie : halloween.zombieList){
-                    zombie.playEffect(EntityEffect.ENTITY_DEATH);
-                }
-            }
-        }.runTaskTimer(plugin, 0, 40);
+
         plugin = this;
     }
     @Override
@@ -1018,6 +1049,7 @@ public final class Magic extends JavaPlugin implements Listener {
            }
        }
     }
+
 
     public static Magic getPlugin() {
         return plugin;
