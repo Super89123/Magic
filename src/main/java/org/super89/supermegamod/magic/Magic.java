@@ -95,7 +95,7 @@ public final class Magic extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
         Bukkit.getPluginManager().registerEvents(playerDataController, this);
-        Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(), this);
+        Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(this), this);
         Bukkit.getPluginManager().registerEvents(new MineBook(), this);
         Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
         Bukkit.getPluginManager().registerEvents(new InventoryWithCoolThings(), this);

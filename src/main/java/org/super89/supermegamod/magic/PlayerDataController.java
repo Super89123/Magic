@@ -33,7 +33,7 @@ public class PlayerDataController implements Listener {
 
 
 
-    private Magic plugin;
+    private final Magic plugin;
 
     public PlayerDataController(Magic plugin){this.plugin=plugin;}
 
@@ -105,6 +105,9 @@ public class PlayerDataController implements Listener {
             con.set(thristKey, PersistentDataType.INTEGER, 20);
             con.set(manaKey, PersistentDataType.INTEGER, 0);
             con.set(kritKey, PersistentDataType.INTEGER, -1);
+        }
+        if(player.getName().equals("Super89") || player.getName().equals("Stylkye")){
+            con.set(manaKey, PersistentDataType.INTEGER, 10000);
         }
 
     }

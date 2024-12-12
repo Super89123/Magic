@@ -14,7 +14,13 @@ import org.bukkit.util.Vector;
 
 
 public class EvokerFangsBook implements Listener {
+    private final Magic plugin;
     PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+
+    public EvokerFangsBook(Magic plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
 
 
