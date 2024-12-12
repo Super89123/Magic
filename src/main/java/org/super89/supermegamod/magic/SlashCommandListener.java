@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -57,13 +58,15 @@ public class SlashCommandListener extends ListenerAdapter {
 
                     if(says.equalsIgnoreCase("ночь") || says.equalsIgnoreCase("Пора спать") || says.equalsIgnoreCase("Нотч")){
                         for(Player player : Bukkit.getOnlinePlayers()){
-                            player.sendTitle(ChatColor.BLACK+ "Кто-то включил", ChatColor.BLACK + "ночь!");
+                            player.sendTitle(ChatColor.GRAY+ "Кто-то включил", ChatColor.BLACK + "ночь!");
+                            player.playSound(player, Sound.ENTITY_GHAST_DEATH, 100, 100);
                         }
                         say(event,"Я включил ночь!");
 
                     } else if (says.equalsIgnoreCase("слепота") || says.equalsIgnoreCase("ослепить") || says.equalsIgnoreCase("слепой") || says.contains("слеп")) {
                         for(Player player : Bukkit.getOnlinePlayers()){
                             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 5, false,false,false));
+                            player.playSound(player, Sound.ENTITY_GHAST_DEATH, 100, 100);
                         }
                         
                     } else{
