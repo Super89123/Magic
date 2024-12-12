@@ -43,6 +43,20 @@ jobs:
     - name: Start Serer
       run: ./gradlew runServer
 
+    - name: upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifact
+        path: build/libs/*.jar
+      
+    - name: Send to Discord
+      uses: discord/actions/webhook@v1
+      with:
+        url: ${{ secrets.DISCORD_WEBHOOK_URL }} # Замените на ваш Discord webhook URL
+        message: "Новый билд готов! \n\n[Загрузить файл](https://github.com/${{ github.repository }}/actions/runs/${{ run.id }}/artifacts/build-artifact)" #  Сообщение в Discord
+        username: "Java CI" #  Имя бота в Discord 
+        avatar_url: "https://avatars.githubusercontent.com/u/9598293?s=400&u=c3e3e4582a56831b132b4492112ca590e7a5f2de&v=4" #  URL аватара бота в Discord 
+
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
     #
