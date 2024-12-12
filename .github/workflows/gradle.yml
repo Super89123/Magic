@@ -33,7 +33,7 @@ jobs:
 
     - name: Send .jar to Discord
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.https://discord.com/api/webhooks/1271823236711059487/k_wXwalTU5qVUW-VYH0U8BhoQwsTWh3bw18q-uBFs06y9xz5kxKGKor-PHFLR_UZ0Wno }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
         curl -F "file=@build/libs/Magic-0.0.1.jar" \
              -F "payload_json={\"content\": \"Новый билд Доступен!\"}" \
