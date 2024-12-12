@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.kyori.adventure.text.Component;
@@ -44,6 +45,7 @@ import org.super89.supermegamod.magic.Utils.ItemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 
@@ -54,16 +56,18 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
 
-    PlayerDataController playerDataController = new PlayerDataController(this);
-    ReflectBook reflectBook = new ReflectBook();
-    PufferManager pufferManager = new PufferManager(this);
-    InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
+    private final PlayerDataController playerDataController = new PlayerDataController(this);
+    private final ReflectBook reflectBook = new ReflectBook();
+    private final PufferManager pufferManager = new PufferManager(this);
+    private InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
     private static Magic plugin;
     private FileConfiguration config1;
     private File configFile1;
     private int hp;
-    WaitAsync waitAsync = new WaitAsync(Bukkit.getScheduler());
+    private boolean isdiscord;
+    private final WaitAsync waitAsync = new WaitAsync(Bukkit.getScheduler());
     private String token;
+    private boolean supersays;
 
 
     public  Map<Location, Block> BarrierBlocks = new HashMap<>();
@@ -174,9 +178,10 @@ public final class Magic extends JavaPlugin implements Listener {
             throw new RuntimeException(e);
         }
         if(file.exists()){
-            int a = (int) config.get("hp");
-            this.hp = a;
-             this.token = (String) config.get("token");
+            this.hp = (int) config.get("hp");
+            this.token = (String) config.get("token");
+            this.isdiscord = config.getBoolean("discord_enabled");
+            this.supersays = config.getBoolean("super_says");
 
         }
         //ffff
@@ -189,28 +194,36 @@ public final class Magic extends JavaPlugin implements Listener {
             }
             config.set("hp", 5);
             config.set("token", "YOUR_TOKEN_BOT");
+            config.set("discord_enabled", true);
+            config.set("super_says", true);
              this.token = (String) config.get("token");
         }
-        JDA jda = JDABuilder.createLight(token, Collections.emptyList())
-                .addEventListeners(new SlashCommandListener())
-                .build();
+        if(isdiscord) {
+            JDA jda = JDABuilder.createLight(token, Collections.emptyList())
+                    .addEventListeners(new SlashCommandListener(plugin))
+                    .build();
 
-        // Register your commands to make them visible globally on Discord:
+            // Register your commands to make them visible globally on Discord:
 
-        CommandListUpdateAction commands = jda.updateCommands();
+            CommandListUpdateAction commands = jda.updateCommands();
 
-        // Add all your commands on this action instance
-        commands.addCommands(
-                Commands.slash("players", "Makes the bot say what you tell it to")
-                        .setGuildOnly(true), // Accepting a user input
-                Commands.slash("leave", "Makes the bot leave the server")
-                        .setGuildOnly(true) // this doesn't make sense in DMs
-                        .setDefaultPermissions(DefaultMemberPermissions.DISABLED) // only admins should be able to use this command.
-        );
+            // Add all your commands on this action instance
+            commands.addCommands(
+                    Commands.slash("players", "Написать игроков в сети")
+                            .setGuildOnly(true), // Accepting a user input
+                    Commands.slash("leave", "Makes the bot leave the server")
+                            .setGuildOnly(true) // this doesn't make sense in DMs
+                            .setDefaultPermissions(DefaultMemberPermissions.DISABLED),
+                    Commands.slash("supersay" , "Уникальная мини-игра!")
+                            .addOption(STRING, "event", "Что ДОЛЖНО пройзойти?")// only admins should be able to use this command.
+            );
 
-        // Then finally send your commands to discord using the API
-        commands.queue();
-
+            // Then finally send your commands to discord using the API
+            commands.queue();
+        }
+        else {
+            getLogger().log(Level.INFO, "Важно! Вы выключили дискорд! Если вы хотите включить его - измените discord_enabled в конфигурации.");
+        }
 
 
         new BukkitRunnable() {
@@ -1050,6 +1063,9 @@ public final class Magic extends JavaPlugin implements Listener {
        }
     }
 
+    public boolean isSupersays() {
+        return supersays;
+    }
 
     public static Magic getPlugin() {
         return plugin;

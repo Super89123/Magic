@@ -95,7 +95,7 @@ public class PlayerDataController implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+        NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         Player player = event.getPlayer();
 
 
