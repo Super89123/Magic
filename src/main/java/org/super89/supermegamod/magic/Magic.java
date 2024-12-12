@@ -306,6 +306,7 @@ public final class Magic extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0, 10);
+        plugin.getLogger().log(Level.INFO, Bukkit.getIp());
 
         plugin = this;
     }

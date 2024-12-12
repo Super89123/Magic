@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.framework.qual.QualifierArgument;
 
 import java.util.Objects;
@@ -59,8 +61,12 @@ public class SlashCommandListener extends ListenerAdapter {
                         }
                         say(event,"Я включил ночь!");
 
-                    }
-                    else{
+                    } else if (says.equalsIgnoreCase("слепота") || says.equalsIgnoreCase("ослепить") || says.equalsIgnoreCase("слепой") || says.contains("слеп")) {
+                        for(Player player : Bukkit.getOnlinePlayers()){
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 5, false,false,false));
+                        }
+                        
+                    } else{
                         say(event, "Я пока не знаю что это)");
                     }
                 }
