@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.checkerframework.framework.qual.QualifierArgument;
 
@@ -48,21 +49,27 @@ public class SlashCommandListener extends ListenerAdapter {
                 event.getHook().sendMessageEmbeds(info.build()).queue();
                 System.out.println("I do it");
                 break;
-            case "supersays":
+            case "supersay":
                 String says = Objects.requireNonNull(event.getOption("event")).getAsString();
                 if(plugin.isSupersays()){
 
                     if(says.equalsIgnoreCase("ночь") || says.equalsIgnoreCase("Пора спать") || says.equalsIgnoreCase("Нотч")){
-                        Objects.requireNonNull(Bukkit.getWorld("world")).setTime(200000);
+                        for(Player player : Bukkit.getOnlinePlayers()){
+                            player.sendTitle(ChatColor.BLACK+ "Кто-то включил", ChatColor.BLACK + "ночь!");
+                        }
+                        say(event,"Я включил ночь!");
 
+                    }
+                    else{
+                        say(event, "Я пока не знаю что это)");
                     }
                 }
                 else{
                     plugin.getLogger().log(Level.INFO, "Внимание! super Says отключен");
-                    event.reply("Эта функция выключена в конфигурации плагина! Обращайтесь к администрации");
+                    event.reply("Эта функция выключена в конфигурации плагина! Обращайтесь к администрации").setEphemeral(true).queue();
                 }
             default:
-                event.reply("I can't handle that command right now :(").setEphemeral(true).queue();
+                event.reply("Я не заю что это такое:(").setEphemeral(true).queue();
         }
     }
 
