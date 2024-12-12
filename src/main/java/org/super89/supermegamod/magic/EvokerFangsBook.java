@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 
 public class EvokerFangsBook implements Listener {
     private final Magic plugin;
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+
 
     public EvokerFangsBook(Magic plugin) {
         this.plugin = plugin;
@@ -25,6 +25,7 @@ public class EvokerFangsBook implements Listener {
 
 
     public void onPlayerInteract(PlayerInteractEvent event) {
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if(event.getPlayer().getCooldown(Material.BOOK) == 0) {
                 if (event.getItem() != null && event.getItem().getItemMeta().hasCustomModelData() && event.getItem().getItemMeta().getCustomModelData() == 10006 && event.getItem().getItemMeta().hasCustomModelData() && playerDataController.getNowPlayerMana(event.getPlayer()) >= 10) {

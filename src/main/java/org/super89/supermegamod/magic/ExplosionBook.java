@@ -13,17 +13,18 @@ import org.bukkit.util.Vector;
 import java.util.Objects;
 
 public class ExplosionBook implements Listener {
-    private Magic plugin;
+    private final Magic plugin;
 
 
     public ExplosionBook(Magic plugin) {
         this.plugin = plugin;
     }
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+
 
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 

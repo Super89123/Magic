@@ -13,9 +13,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class WindBook implements Listener {
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+    private final Magic plugin;
+
+
+    public WindBook(Magic plugin) {
+        this.plugin = plugin;
+    }
+
+
     @EventHandler
     public void entity(EntityDamageByEntityEvent event){
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         if(event.getDamager() instanceof Player){
             Player player = (Player) event.getDamager();
             ItemStack item = player.getInventory().getItemInMainHand();

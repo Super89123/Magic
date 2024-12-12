@@ -16,15 +16,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReflectBook implements Listener {
+    private final Magic plugin;
 
     public Map<Player, Long> activePlayers = new HashMap<>();
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
 
 
+    public ReflectBook(Magic plugin) {
+        this.plugin = plugin;
+    }
 
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
 

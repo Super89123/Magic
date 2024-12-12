@@ -44,7 +44,7 @@ public class PlayerDataController implements Listener {
     public int getNowPlayerMana(Player player) {
          NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
          NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-         NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+         NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(manaKey, PersistentDataType.INTEGER);
     }

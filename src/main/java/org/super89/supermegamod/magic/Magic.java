@@ -3,9 +3,9 @@ package org.super89.supermegamod.magic;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
+
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.kyori.adventure.text.Component;
@@ -48,7 +48,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
-
+@SuppressWarnings("all")
 public final class Magic extends JavaPlugin implements Listener {
 
     public final String NAME = "Quantov";
@@ -57,7 +57,7 @@ public final class Magic extends JavaPlugin implements Listener {
 
 
     private final PlayerDataController playerDataController = new PlayerDataController(this);
-    private final ReflectBook reflectBook = new ReflectBook();
+    private final ReflectBook reflectBook = new ReflectBook(this);
     private final PufferManager pufferManager = new PufferManager(this);
     private InventoryWithCoolThings inventoryWithCoolThings = new InventoryWithCoolThings();
     private static Magic plugin;
@@ -90,22 +90,22 @@ public final class Magic extends JavaPlugin implements Listener {
 
         // Регистрация ивентов
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new LevitationBook(), this);
+        getServer().getPluginManager().registerEvents(new LevitationBook(this), this);
         getServer().getPluginManager().registerEvents(new SonicBook(), this);
         Bukkit.getPluginManager().registerEvents(new TeleportBook(this), this);
         Bukkit.getPluginManager().registerEvents(new ExplosionBook(this), this);
         Bukkit.getPluginManager().registerEvents(playerDataController, this);
         Bukkit.getPluginManager().registerEvents(new EvokerFangsBook(this), this);
-        Bukkit.getPluginManager().registerEvents(new MineBook(), this);
-        Bukkit.getPluginManager().registerEvents(new LevitationBook(), this);
+        Bukkit.getPluginManager().registerEvents(new MineBook(this), this);
+        Bukkit.getPluginManager().registerEvents(new LevitationBook(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryWithCoolThings(), this);
         Bukkit.getPluginManager().registerEvents(pufferManager, this);
         Bukkit.getPluginManager().registerEvents(new ShieldThings(), this);
-        Bukkit.getPluginManager().registerEvents(new ReflectBook(), this);
-        Bukkit.getPluginManager().registerEvents(new ReviewBook(), this);
+        Bukkit.getPluginManager().registerEvents(new ReflectBook(this), this);
+        Bukkit.getPluginManager().registerEvents(new ReviewBook(this), this);
 
-        Bukkit.getPluginManager().registerEvents(new WindBook(), this);
-        Bukkit.getPluginManager().registerEvents(new FireBook(), this);
+        Bukkit.getPluginManager().registerEvents(new WindBook(this), this);
+        Bukkit.getPluginManager().registerEvents(new FireBook(this), this);
         Bukkit.getPluginManager().registerEvents(new CustomPotion(), this);
 
 
@@ -207,12 +207,13 @@ public final class Magic extends JavaPlugin implements Listener {
 
             CommandListUpdateAction commands = jda.updateCommands();
 
-            // Add all your commands on this action instance
+
             commands.addCommands(
                     Commands.slash("players", "Написать игроков в сети")
                             .setGuildOnly(true), // Accepting a user input
-                    Commands.slash("leave", "Makes the bot leave the server")
+                    Commands.slash("send", "Отправить команду на сервер")
                             .setGuildOnly(true) // this doesn't make sense in DMs
+                            .addOption(STRING, "command", "Эту команду введет бот в консоль")
                             .setDefaultPermissions(DefaultMemberPermissions.DISABLED),
                     Commands.slash("supersay" , "Уникальная мини-игра!")
                             .addOption(STRING, "event", "Что ДОЛЖНО пройзойти?")// only admins should be able to use this command.

@@ -10,9 +10,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ReviewBook implements Listener {
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+    private final Magic plugin;
+
+
+    public ReviewBook(Magic plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onPlayerUSE(PlayerInteractEvent event){
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         Player player = event.getPlayer();
         Location spawnpoint = player.getBedSpawnLocation();
         Location worldSpawn = player.getWorld().getSpawnLocation();

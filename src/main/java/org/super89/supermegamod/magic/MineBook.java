@@ -10,9 +10,17 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class MineBook implements Listener {
-    PlayerDataController playerDataController = new PlayerDataController(Magic.getPlugin());
+
+
+    private final Magic plugin;
+
+    public MineBook(Magic plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void PlayerInteract(PlayerInteractEvent event){
+        PlayerDataController playerDataController = new PlayerDataController(plugin);
         Player player = event.getPlayer();
         player.getInventory().getItemInMainHand();
         if(player.getInventory().getItemInMainHand().hasItemMeta() && player.getInventory().getItemInMainHand().getItemMeta().hasCustomModelData() && player.getInventory().getItemInMainHand().getType() == Material.BOOK && event.getAction().name().contains("RIGHT_CLICK") && player.getInventory().getItemInMainHand().getItemMeta().getCustomModelData() == 10002 && playerDataController.getNowPlayerMana(player) >= 40){
