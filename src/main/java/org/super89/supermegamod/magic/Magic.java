@@ -237,18 +237,15 @@ public final class Magic extends JavaPlugin implements Listener {
                     String uuid = player.getUniqueId().toString();
                     File playerDataFile = new File(getPlugin(Magic.class).getDataFolder(), "playerdata.yml");
                     FileConfiguration playerDataConfig = YamlConfiguration.loadConfiguration(playerDataFile);
-                    int maxmana = playerDataConfig.getInt(uuid + "." + "maxmana");
-                    int nowmana = playerDataConfig.getInt(uuid + "." + "nowmana");
+                    int maxmana = 100;
+                    int nowmana = playerDataController.getNowPlayerMana(player);
+
                     int add;
                     if (nowmana < 75) {
                         int newmana = (int) (maxmana * 0.01);
                         add = Math.min(newmana + nowmana, maxmana);
-                        playerDataConfig.set(uuid + "." + "nowmana", add);
-                        try {
-                            playerDataConfig.save(playerDataFile);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        playerDataController.setNowPlayerMana(player, playerDataController.getNowPlayerMana(player)+add);
+
                     }
                     ItemStack item = player.getInventory().getItemInOffHand();
                     if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == 1010) {

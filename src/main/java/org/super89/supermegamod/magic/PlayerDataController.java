@@ -51,14 +51,14 @@ public class PlayerDataController implements Listener {
     public void setNowPlayerMana(Player player, int mana) {
         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+        NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         con.set(manaKey, PersistentDataType.INTEGER, mana);
     }
     public void setNowPlayerThrist(Player player, int thrist) {
         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+        NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         con.set(thristKey, PersistentDataType.INTEGER, thrist);
 
@@ -66,14 +66,14 @@ public class PlayerDataController implements Listener {
     public int getNowPlayerThrist(Player player) {
         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+        NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(thristKey, PersistentDataType.INTEGER);
     }
     public int getNowPlayerState(Player player) {
         NamespacedKey thristKey = new NamespacedKey(plugin, "thrist");
         NamespacedKey manaKey = new NamespacedKey(plugin, "mana");
-        NamespacedKey kritKey = new NamespacedKey(plugin.getPlugin(), "krit");
+        NamespacedKey kritKey = new NamespacedKey(plugin, "krit");
         PersistentDataContainer con = player.getPersistentDataContainer();
         return con.get(kritKey, PersistentDataType.INTEGER);
     }
